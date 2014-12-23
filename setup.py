@@ -5,13 +5,13 @@ def readme():
         return f.read()
 
 setup(name='zeroless',
-      version='0.1.0',
+      version='0.1.1',
       description='A pythonic approach for distributed systems with ZeroMQ.',
       long_description=readme(),
       url='https://github.com/zmqless/zeroless',
       author='Lucas Lira Gomes',
       author_email='x8lucas8x@gmail.com',
-      license='LGPL3',
+      license='LGPL2',
       packages=['zeroless'],
       install_requires=[
           'pyzmq',
