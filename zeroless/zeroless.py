@@ -91,7 +91,6 @@ class ConnectSock(Sock):
         Sock.__init__(self)
 
     def setup(self):
-        print('tcp://' + self._ip + ':' + str(self._port))
         self._sock.connect('tcp://' + self._ip + ':' + str(self._port))
 
 class BindSock(Sock):
@@ -102,5 +101,4 @@ class BindSock(Sock):
         Sock.__init__(self)
 
     def setup(self):
-        print('tcp://' + self._interface + ':' + str(self._port))
         self._sock.bind('tcp://' + self._interface + ':' + str(self._port))
