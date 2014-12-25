@@ -39,46 +39,53 @@ class Sock:
             self.pair = None
             self.listen_for_pair = None
 
-    def pub(self, data, sleepTime=5):
-        self.__sock(zmq.PUB, 5).send(data)
+    def pub(self, *data, sleepTime=5):
+        self.__sock(zmq.PUB, 5).send_multipart(data)
 
     def listen_for_pub(self, sleepTime=5):
         sock = self.__sock(zmq.SUB, 5)
         sock.setsockopt(zmq.SUBSCRIBE, b'')
 
         while True:
-            yield sock.recv()
+            frames = sock.recv_multipart()
+            yield frames if len(frames) > 1 else frames[0]
 
-    def push(self, data):
-        self.__sock(zmq.PUSH).send(data)
+    def push(self, *data):
+        self.__sock(zmq.PUSH).send_multipart(data)
 
     def listen_for_push(self):
         sock = self.__sock(zmq.PULL)
 
         while True:
-            yield sock.recv()
+            frames = sock.recv_multipart()
+            yield frames if len(frames) > 1 else frames[0]
 
-    def request(self, data):
-        self.__sock(zmq.REQ).send(data)
-        return self.__sock(zmq.REQ).recv()
+    def request(self, *data):
+        sock = self.__sock(zmq.REQ)
+
+        sock.send_multipart(data)
+        frames = sock.recv_multipart()
+        return frames if len(frames) > 1 else frames[0]
 
     def listen_for_request(self):
         sock = self.__sock(zmq.REP)
 
         while True:
-            yield sock.recv()
+            frames = sock.recv_multipart()
+            yield frames if len(frames) > 1 else frames[0]
 
-    def reply(self, data):
-        self.__sock(zmq.REP).send(data)
+    def reply(self, *data):
+        self.__sock(zmq.REP).send_multipart(data)
 
     def listen_for_pair(self):
         sock = self.__sock(zmq.PAIR)
 
         while True:
-            yield sock.recv()
+            frames = sock.recv_multipart()
+            yield frames if len(frames) > 1 else frames[0]
 
-    def pair(self, data):
-        self.__sock(zmq.PAIR).send(data)
+    def pair(self, *data):
+        self.__sock(zmq.PAIR).send_multipart(data)
 
     def setup(self):
         raise NotImplemented()
