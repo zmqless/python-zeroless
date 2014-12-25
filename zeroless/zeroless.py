@@ -22,9 +22,21 @@ class Sock:
             self._sock = self._context.socket(pattern)
             self._disable_patterns_except(pattern)
             self.setup()
-            sleep(sleepTime)
+
+            if pattern == zmq.SUB:
+                self._sock.setsockopt(zmq.SUBSCRIBE, b'')
+                sleep(5)
+            elif pattern == zmq.PUB:
+                sleep(5)
 
         return self._sock
+
+    def __send(self, pattern, data):
+        return self.__sock(pattern).send_multipart(data)
+
+    def __recv(self, pattern):
+        frames = self.__sock(pattern).recv_multipart()
+        return frames if len(frames) > 1 else frames[0]
 
     def _disable_patterns_except(self, pattern):
         if not pattern == zmq.PUB: self.pub = None
@@ -39,53 +51,37 @@ class Sock:
             self.pair = None
             self.listen_for_pair = None
 
-    def pub(self, *data, sleepTime=5):
-        self.__sock(zmq.PUB, 5).send_multipart(data)
+    def pub(self, *data):
+        self.__send(zmq.PUB, data)
 
-    def listen_for_pub(self, sleepTime=5):
-        sock = self.__sock(zmq.SUB, 5)
-        sock.setsockopt(zmq.SUBSCRIBE, b'')
-
+    def listen_for_pub(self):
         while True:
-            frames = sock.recv_multipart()
-            yield frames if len(frames) > 1 else frames[0]
+            yield self.__recv(zmq.SUB)
 
     def push(self, *data):
-        self.__sock(zmq.PUSH).send_multipart(data)
+        self.__send(zmq.PUSH, data)
 
     def listen_for_push(self):
-        sock = self.__sock(zmq.PULL)
-
         while True:
-            frames = sock.recv_multipart()
-            yield frames if len(frames) > 1 else frames[0]
+            yield self.__recv(zmq.PULL)
 
     def request(self, *data):
-        sock = self.__sock(zmq.REQ)
-
-        sock.send_multipart(data)
-        frames = sock.recv_multipart()
-        return frames if len(frames) > 1 else frames[0]
+        self.__send(zmq.REQ, data)
+        return self.__recv(zmq.REQ)
 
     def listen_for_request(self):
-        sock = self.__sock(zmq.REP)
-
         while True:
-            frames = sock.recv_multipart()
-            yield frames if len(frames) > 1 else frames[0]
+            yield self.__recv(zmq.REP)
 
     def reply(self, *data):
-        self.__sock(zmq.REP).send_multipart(data)
+        self.__send(zmq.REP, data)
 
     def listen_for_pair(self):
-        sock = self.__sock(zmq.PAIR)
-
         while True:
-            frames = sock.recv_multipart()
-            yield frames if len(frames) > 1 else frames[0]
+            yield self.__recv(zmq.PAIR)
 
     def pair(self, *data):
-        self.__sock(zmq.PAIR).send_multipart(data)
+        self.__send(zmq.PAIR, data)
 
     def setup(self):
         raise NotImplemented()
