@@ -84,7 +84,7 @@ class Sock:
         self.__send(zmq.PAIR, data)
 
     def setup(self):
-        raise NotImplemented()
+        raise NotImplementedError()
 
 class ConnectSock(Sock):
     def __init__(self, ip, port):
