@@ -1,4 +1,10 @@
-from zeroless import connect
+import logging
+
+from zeroless import (connect, log)
+
+consoleHandler = logging.StreamHandler()
+log.setLevel(logging.DEBUG)
+log.addHandler(consoleHandler)
 
 # The publisher client connects to localhost and sends three messages.
 sock = connect(port=12345)
