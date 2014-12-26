@@ -140,6 +140,17 @@ expect one-to-one and bidirectional communication.
     for msg in ["Msg1", "Msg2", "Msg3"]:
         sock.pair(msg.encode())
 
+Logging
+-------
+
+The ``zeroless`` module allows logging via a global `Logger object <https://docs.python.org/3/library/logging.html#logger-objects>`__.
+
+.. code:: python
+
+    from zeroless import log
+
+To enable it, just add an `Handler object <https://docs.python.org/3/library/logging.html#handler-objects>`__ and set an appropriate `logging level <https://docs.python.org/3/library/logging.html#logging-levels>`__.
+
 License
 -------
 
