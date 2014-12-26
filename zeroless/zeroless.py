@@ -1,6 +1,10 @@
 import zmq
+import logging
 
 from time import sleep
+
+log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
 
 def connect(port, ip='127.0.0.1'):
     return ConnectSock(ip, port)
@@ -24,10 +28,16 @@ class Sock:
             self.setup()
 
             if pattern == zmq.SUB:
+                log.debug('[SUB] Sleeping for 5 seconds to avoid losing '
+                          'initial messages.')
                 self._sock.setsockopt(zmq.SUBSCRIBE, b'')
                 sleep(5)
             elif pattern == zmq.PUB:
+                log.debug('[PUB] Sleeping for 5 seconds to avoid losing '
+                          'initial messages.')
                 sleep(5)
+
+            log.info('Ready...')
 
         return self._sock
 
@@ -53,35 +63,50 @@ class Sock:
 
     def pub(self, *data):
         self.__send(zmq.PUB, data)
+        log.debug('[PUB] Sending: {0}'.format(data))
 
     def listen_for_pub(self):
         while True:
-            yield self.__recv(zmq.SUB)
+            data = self.__recv(zmq.SUB)
+            log.debug('[SUB] Receiving: {0}'.format(data))
+            yield data
 
     def push(self, *data):
         self.__send(zmq.PUSH, data)
+        log.debug('[PUSH] Sending: {0}'.format(data))
 
     def listen_for_push(self):
         while True:
-            yield self.__recv(zmq.PULL)
+            data = self.__recv(zmq.PULL)
+            log.debug('[PULL] Receiving: {0}'.format(data))
+            yield data
 
     def request(self, *data):
         self.__send(zmq.REQ, data)
-        return self.__recv(zmq.REQ)
+        log.debug('[REQUEST] Sending: {0}'.format(data))
+        data = self.__recv(zmq.REQ)
+        log.debug('[REQUEST] Receiving: {0}'.format(data))
+        return data
 
     def listen_for_request(self):
         while True:
-            yield self.__recv(zmq.REP)
+            data = self.__recv(zmq.REP)
+            log.debug('[REPLY] Receiving: {0}'.format(data))
+            yield data
 
     def reply(self, *data):
         self.__send(zmq.REP, data)
+        log.debug('[REPLY] Sending: {0}'.format(data))
 
     def listen_for_pair(self):
         while True:
-            yield self.__recv(zmq.PAIR)
+            data = self.__recv(zmq.PAIR)
+            log.debug('[PAIR] Receiving: {0}'.format(data))
+            yield data
 
     def pair(self, *data):
         self.__send(zmq.PAIR, data)
+        log.debug('[PAIR] Sending: {0}'.format(data))
 
     def setup(self):
         raise NotImplementedError()
@@ -94,6 +119,8 @@ class ConnectSock(Sock):
         Sock.__init__(self)
 
     def setup(self):
+        log.info('Connecting to {0} on port {1}'.format(self._ip,
+                                                        self._port))
         self._sock.connect('tcp://' + self._ip + ':' + str(self._port))
 
 class BindSock(Sock):
@@ -104,4 +131,6 @@ class BindSock(Sock):
         Sock.__init__(self)
 
     def setup(self):
+        log.info('Binding to interface {0} on port {1}'.format(self._interface,
+                                                               self._port))
         self._sock.bind('tcp://' + self._interface + ':' + str(self._port))
