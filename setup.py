@@ -1,4 +1,3 @@
-import os
 import sys
 
 from setuptools import setup
@@ -6,17 +5,14 @@ from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
 class Pytest(TestCommand):
-    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.tox_args = None
     def finalize_options(self):
         TestCommand.finalize_options(self)
         self.test_args = []
         self.test_suite = True
     def run_tests(self):
-        errno = os.system('py.test')
-        sys.exit(errno)
+        import pytest
+        errcode = pytest.main(self.test_args)
+        sys.exit(errcode)
 
 def readme():
     with open('README.rst') as f:
