@@ -29,4 +29,6 @@ setup(name='zeroless',
       install_requires=[
           'pyzmq',
       ],
+      test_suite='nose.collector',
+      tests_require=['nose'],
       zip_safe=False)
