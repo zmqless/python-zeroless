@@ -152,6 +152,21 @@ The ``zeroless`` module allows logging via a global `Logger object <https://docs
 
 To enable it, just add an `Handler object <https://docs.python.org/3/library/logging.html#handler-objects>`__ and set an appropriate `logging level <https://docs.python.org/3/library/logging.html#logging-levels>`__.
 
+Testing
+-------
+
+To run individual tests:
+
+.. code-block:: bash
+
+    $ py.test tests/test_desired_module.py
+
+To run all the tests:
+
+.. code-block:: bash
+
+    $ python setup.py test
+
 License
 -------
 
