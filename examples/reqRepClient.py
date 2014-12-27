@@ -10,4 +10,5 @@ log.addHandler(consoleHandler)
 sock = connect(port=12345)
 
 for msg in ["Msg1", "Msg2", "Msg3"]:
-    sock.request(msg.encode())
+    response = sock.request_and_listen(msg.encode())
+    print(response)
