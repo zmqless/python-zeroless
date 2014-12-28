@@ -1,6 +1,8 @@
 Zeroless
 ========
 
+|Build Status| |Coverage Status|
+
 Yet another `ZeroMQ <http://zeromq.org/>`__ wrapper for Python. However,
 differing from `pyzmq <https://github.com/zeromq/pyzmq>`__, which tries
 to stay very close to the C++ implementation, this project aims to make
@@ -167,6 +169,12 @@ To run all the tests:
 
     $ python setup.py test
 
+Alternatively, you can use tox:
+
+.. code-block:: bash
+
+    $ tox
+
 License
 -------
 
@@ -184,3 +192,8 @@ General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with this library. If not, see http://www.gnu.org/licenses/.
+
+.. |Build Status| image:: https://travis-ci.org/zmqless/zeroless.svg?branch=master
+   :target: https://travis-ci.org/zmqless/zeroless
+.. |Coverage Status| image:: https://coveralls.io/repos/zmqless/zeroless/badge.png?branch=master
+   :target: https://coveralls.io/r/zmqless/zeroless?branch=master
