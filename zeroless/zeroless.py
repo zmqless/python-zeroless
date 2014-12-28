@@ -84,9 +84,19 @@ class Sock:
     def request(self, *data):
         self.__send(zmq.REQ, data)
         log.debug('[REQUEST] Sending: {0}'.format(data))
+
+    def request_and_listen(self, *data):
+        self.request(*data)
+        return next(self.listen_for_reply())
+
+    def listen_for_reply(self):
         data = self.__recv(zmq.REQ)
         log.debug('[REQUEST] Receiving: {0}'.format(data))
-        return data
+        yield data
+
+    def reply(self, *data):
+        self.__send(zmq.REP, data)
+        log.debug('[REPLY] Sending: {0}'.format(data))
 
     def listen_for_request(self):
         while True:
@@ -94,19 +104,15 @@ class Sock:
             log.debug('[REPLY] Receiving: {0}'.format(data))
             yield data
 
-    def reply(self, *data):
-        self.__send(zmq.REP, data)
-        log.debug('[REPLY] Sending: {0}'.format(data))
+    def pair(self, *data):
+        self.__send(zmq.PAIR, data)
+        log.debug('[PAIR] Sending: {0}'.format(data))
 
     def listen_for_pair(self):
         while True:
             data = self.__recv(zmq.PAIR)
             log.debug('[PAIR] Receiving: {0}'.format(data))
             yield data
-
-    def pair(self, *data):
-        self.__send(zmq.PAIR, data)
-        log.debug('[PAIR] Sending: {0}'.format(data))
 
     def setup(self):
         raise NotImplementedError()

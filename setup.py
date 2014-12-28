@@ -1,4 +1,18 @@
+import sys
+
 from setuptools import setup
+
+from setuptools.command.test import test as TestCommand
+
+class Pytest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+    def run_tests(self):
+        import pytest
+        errcode = pytest.main(self.test_args)
+        sys.exit(errcode)
 
 def readme():
     with open('README.rst') as f:
@@ -29,4 +43,6 @@ setup(name='zeroless',
       install_requires=[
           'pyzmq',
       ],
+      cmdclass = {'test': Pytest},
+      tests_require=['pytest'],
       zip_safe=False)

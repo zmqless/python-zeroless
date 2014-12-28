@@ -112,7 +112,8 @@ services.
     sock = connect(port=12345)
 
     for msg in ["Msg1", "Msg2", "Msg3"]:
-        sock.request(msg.encode())
+        response = sock.request_and_listen(msg.encode())
+        print(response)
 
 Pair
 ~~~~
@@ -150,6 +151,21 @@ The ``zeroless`` module allows logging via a global `Logger object <https://docs
     from zeroless import log
 
 To enable it, just add an `Handler object <https://docs.python.org/3/library/logging.html#handler-objects>`__ and set an appropriate `logging level <https://docs.python.org/3/library/logging.html#logging-levels>`__.
+
+Testing
+-------
+
+To run individual tests:
+
+.. code-block:: bash
+
+    $ py.test tests/test_desired_module.py
+
+To run all the tests:
+
+.. code-block:: bash
+
+    $ python setup.py test
 
 License
 -------
