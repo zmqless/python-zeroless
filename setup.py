@@ -25,6 +25,7 @@ setup(name='zeroless',
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Developers',
+          'Programming Language :: Python :: 2',
           'Programming Language :: Python :: 3',
           'Topic :: System :: Networking',
           'Topic :: Communications',
