@@ -3,42 +3,42 @@ import pytest
 from zeroless import (bind, connect)
 
 @pytest.fixture(scope="module")
-def sock1():
-    return bind(port=7891)
+def listen_for_push():
+    return bind(port=7891).pull()
 
 @pytest.fixture(scope="module")
-def sock2():
-    return connect(port=7891)
+def push():
+    return connect(port=7891).push()
 
 class TestPushPull:
-    def test_distribute(self, sock1, sock2):
+    def test_distribute(self, push, listen_for_push):
         msg = b'msg'
 
-        sock2.push(msg)
-        result = next(sock1.listen_for_push())
+        push(msg)
+        result = next(listen_for_push)
         assert result == msg
 
-    def test_distribute_multipart(self, sock1, sock2):
+    def test_distribute_multipart(self, push, listen_for_push):
         msg1 = b'msg1'
         msg2 = b'msg2'
 
-        sock2.push(msg1, msg2)
-        result = next(sock1.listen_for_push())
+        push(msg1, msg2)
+        result = next(listen_for_push)
         assert result == [msg1, msg2]
 
-    def test_multiple_distribute(self, sock1, sock2):
+    def test_multiple_distribute(self, push, listen_for_push):
         msgs = [b'msg' + bytes(i) for i in range(10)]
 
         for msg in msgs:
-            sock2.push(msg)
-            result = next(sock1.listen_for_push())
+            push(msg)
+            result = next(listen_for_push)
             assert result == msg
 
-    def test_multiple_distribute_multipart(self, sock1, sock2):
+    def test_multiple_distribute_multipart(self, push, listen_for_push ):
         msgs1 = [b'msg1' + bytes(i) for i in range(10)]
         msgs2 = [b'msg2' + bytes(i) for i in range(10)]
 
         for msg1, msg2 in zip(msgs1, msgs2):
-            sock2.push(msg1, msg2)
-            result = next(sock1.listen_for_push())
+            push(msg1, msg2)
+            result = next(listen_for_push)
             assert result == [msg1, msg2]
