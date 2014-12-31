@@ -2,6 +2,7 @@ import zmq
 import logging
 
 from time import sleep
+from warnings import warn
 from functools import partial
 
 log = logging.getLogger(__name__)
@@ -115,6 +116,13 @@ class BindSock(Sock):
         Sock.__init__(self)
 
     def _setup(self, sock):
+        if sock.socket_type == zmq.SUB:
+            warning = 'SUB sockets that bind will not get any message before '
+            warning += 'they first ask for via the provided generator, so '
+            warning += 'prefer to bind PUB sockets if missing some messages '
+            warning += 'is not an option'
+            warn(warning)
+
         log.info('Binding to interface {0} on port {1}'.format(self._interface,
                                                                self._port))
         sock.bind('tcp://' + self._interface + ':' + str(self._port))
