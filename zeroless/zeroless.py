@@ -33,8 +33,8 @@ class Sock:
 
     def __send_with_prefix(self, sock, prefix_frames):
         while True:
-            data = (yield)
-            sock.send_multipart(prefix_frames + data)
+            data = prefix_frames + (yield)
+            sock.send_multipart(data)
             log.debug('Sending: {0}'.format(data))
 
     def __recv(self, sock):
@@ -45,7 +45,7 @@ class Sock:
 
     def send_generator(self, sock, topic=None):
         if topic:
-            gen = self.__send_with_prefix(sock, [topic])
+            gen = self.__send_with_prefix(sock, topic)
         else:
             gen = self.__send(sock)
 
@@ -57,9 +57,9 @@ class Sock:
         return self.__recv(sock)
 
     # PubSub pattern
-    def pub(self, topic=None):
+    def pub(self, topic=b''):
         sock = self.__sock(zmq.PUB)
-        return self.send_generator(sock, topic)
+        return self.send_generator(sock, (topic,))
 
     def sub(self, topics=(b'',)):
         sock = self.__sock(zmq.SUB)
