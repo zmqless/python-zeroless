@@ -24,6 +24,7 @@ class TestPubSub:
     def test_publish(self, pub, listen_for_pub):
         msg = b'msg'
 
+        sleep(0.1)
         pub(msg)
         result = next(listen_for_pub)
         assert result == [b'', msg]
@@ -31,6 +32,7 @@ class TestPubSub:
     def test_publish_with_topic(self, pub_with_topic, listen_for_pub_with_topic):
         msg = b'msg'
 
+        sleep(0.1)
         pub_with_topic(msg)
         result = next(listen_for_pub_with_topic)
         assert result != [b'', msg]
@@ -40,6 +42,7 @@ class TestPubSub:
         msg1 = b'msg1'
         msg2 = b'msg2'
 
+        sleep(0.1)
         pub(msg1, msg2)
         result = next(listen_for_pub)
         assert result == [b'', msg1, msg2]
@@ -47,6 +50,7 @@ class TestPubSub:
     def test_multiple_publish(self, pub, listen_for_pub):
         msgs = [b'msg' + bytes(i) for i in range(10)]
 
+        sleep(0.1)
         for msg in msgs:
             pub(msg)
             result = next(listen_for_pub)
@@ -56,6 +60,7 @@ class TestPubSub:
         msgs1 = [b'msg1' + bytes(i) for i in range(10)]
         msgs2 = [b'msg2' + bytes(i) for i in range(10)]
 
+        sleep(0.1)
         for msg1, msg2 in zip(msgs1, msgs2):
             pub(msg1, msg2)
             result = next(listen_for_pub)
