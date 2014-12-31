@@ -92,9 +92,9 @@ PubNub or IoT protocols like MQTT are examples of this pattern usage.
 
 Note: ZMQ's topic filtering capabilities are publisher side since ZMQ 3.0.
 
-Warning: SUB sockets that bind will not get any message before they first ask
-         for via the provided generator, so prefer to bind PUB sockets if missing
-         some messages is not an option.
+Last but not least, SUB sockets that bind will not get any message before they
+first ask for via the provided generator, so prefer to bind PUB sockets if
+missing some messages is not an option.
 
 Request-Reply
 ~~~~~~~~~~~~~
