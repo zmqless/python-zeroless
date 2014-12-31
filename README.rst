@@ -73,16 +73,8 @@ PubNub or IoT protocols like MQTT are examples of this pattern usage.
 
 .. code:: python
 
-    # The subscriber server binds to port 12345 and waits for incoming messages.
-    listen_for_pub = bind(port=12345).sub(topics=[b'sh'])
-
-    for topic, msg in listen_for_pub:
-        print(topic, ' - ', msg)
-
-.. code:: python
-
-    # The publisher client connects to localhost and sends three messages.
-    pub = connect(port=12345).pub(topic=b'sh')
+    # The publisher server connects to localhost and sends three messages.
+    pub = bind(port=12345).pub(topic=b'sh')
 
     # Gives publisher some time to get initial subscriptions
     sleep(1)
@@ -90,7 +82,19 @@ PubNub or IoT protocols like MQTT are examples of this pattern usage.
     for msg in [b"Msg1", b"Msg2", b"Msg3"]:
         pub(msg)
 
+.. code:: python
+
+    # The subscriber client binds to port 12345 and waits for incoming messages.
+    listen_for_pub = connect(port=12345).sub(topics=[b'sh'])
+
+    for topic, msg in listen_for_pub:
+        print(topic, ' - ', msg)
+
 Note: ZMQ's topic filtering capabilities are publisher side since ZMQ 3.0.
+
+Warning: SUB sockets that bind will not get any message before they first ask
+         for via the provided generator, so prefer to bind PUB sockets if missing
+         some messages is not an option.
 
 Request-Reply
 ~~~~~~~~~~~~~
