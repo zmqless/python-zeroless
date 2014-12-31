@@ -7,8 +7,9 @@ log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The request client connects to localhost and sends three messages.
-sock = connect(port=12345)
+request, listen_for_reply = connect(port=12345).request()
 
-for msg in ["Msg1", "Msg2", "Msg3"]:
-    response = sock.request_and_listen(msg.encode())
+for msg in [b"Msg1", b"Msg2", b"Msg3"]:
+    request(msg)
+    response = next(listen_for_reply)
     print(response)

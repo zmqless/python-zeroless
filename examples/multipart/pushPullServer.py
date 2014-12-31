@@ -1,7 +1,7 @@
 from zeroless import bind
 
 # The pull server binds to port 12345 and waits for incoming messages.
-sock = bind(port=12345)
+listen_for_push = bind(port=12345).pull()
 
-for id, msg in sock.listen_for_push():
+for id, msg in listen_for_push:
     print(id, ' - ', msg)

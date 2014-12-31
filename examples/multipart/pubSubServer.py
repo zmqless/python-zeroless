@@ -1,7 +1,7 @@
 from zeroless import bind
 
 # The subscriber server binds to port 12345 and waits for incoming messages.
-sock = bind(port=12345)
+listen_for_pub = bind(port=12345).sub()
 
-for id, msg in sock.listen_for_pub():
+for id, msg in listen_for_pub:
     print(id, ' - ', msg)

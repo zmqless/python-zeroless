@@ -1,5 +1,7 @@
 import logging
 
+from time import sleep
+
 from zeroless import (connect, log)
 
 consoleHandler = logging.StreamHandler()
@@ -7,7 +9,10 @@ log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The publisher client connects to localhost and sends three messages.
-sock = connect(port=12345)
+pub = connect(port=12345).pub(topic=b'sh')
 
-for msg in ["Msg1", "Msg2", "Msg3"]:
-    sock.pub(msg.encode())
+# Gives publisher some time to get initial subscriptions
+sleep(1)
+
+for msg in [b"Msg1", b"Msg2", b"Msg3"]:
+    pub(msg)

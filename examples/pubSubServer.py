@@ -7,7 +7,7 @@ log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The subscriber server binds to port 12345 and waits for incoming messages.
-sock = bind(port=12345)
+listen_for_pub = bind(port=12345).sub(topics=[b'sh'])
 
-for msg in sock.listen_for_pub():
-    print(msg)
+for topic, msg in listen_for_pub:
+    print(topic, ' - ', msg)
