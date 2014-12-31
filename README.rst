@@ -27,12 +27,11 @@ Python API
 
 In the ``zeroless`` module, two functions can be used to the define how
 zeroless' sockets are related (i.e. ``bind`` and ``connect``). Both are
-able to create a sort of generic 0MQ socket, which can then later become
-an instance of a specific message passing pattern.
+able to create a *callable* and/or *iterable* socket, depending on the
+message passing pattern.
 
-The generic socket object is both *callable* and *iterable*. So that you
-can iterate over incoming messages, using the methods starting with
-listen\_for\_\*, and/or call to transmit a message.
+So that you can iterate over incoming messages and/or call to transmit a
+message.
 
 All examples assume:
 
@@ -51,18 +50,18 @@ generalisation of the Map-Reduce pattern.
 .. code:: python
 
     # The pull server binds to port 12345 and waits for incoming messages.
-    sock = bind(port=12345)
+    listen_for_push = bind(port=12345).pull()
 
-    for msg in sock.listen_for_pull():
+    for msg in listen_for_push:
         print(msg)
 
 .. code:: python
 
     # The push client connects to localhost and sends three messages.
-    sock = connect(port=12345)
+    push = connect(port=12345).push()
 
-    for msg in ["Msg1", "Msg2", "Msg3"]:
-        sock.push(msg.encode())
+    for msg in [b"Msg1", b"Msg2", b"Msg3"]:
+        push(msg)
 
 Publisher-Subscriber
 ~~~~~~~~~~~~~~~~~~~~
@@ -75,21 +74,23 @@ PubNub or IoT protocols like MQTT are examples of this pattern usage.
 .. code:: python
 
     # The subscriber server binds to port 12345 and waits for incoming messages.
-    sock = bind(port=12345)
+    listen_for_pub = bind(port=12345).sub(topics=[b'sh'])
 
-    for msg in sock.listen_for_pub():
-        print(msg)
+    for topic, msg in listen_for_pub:
+        print(topic, ' - ', msg)
 
 .. code:: python
 
     # The publisher client connects to localhost and sends three messages.
-    sock = connect(port=12345)
+    pub = connect(port=12345).pub(topic=b'sh')
 
-    for msg in ["Msg1", "Msg2", "Msg3"]:
-        sock.pub(msg.encode())
+    # Gives publisher some time to get initial subscriptions
+    sleep(1)
 
-Note: There is no support for topic usage, as ZMQ's topic filtering
-capabilities are client side only.
+    for msg in [b"Msg1", b"Msg2", b"Msg3"]:
+        pub(msg)
+
+Note: ZMQ's topic filtering capabilities are publisher side since ZMQ 3.0.
 
 Request-Reply
 ~~~~~~~~~~~~~
@@ -102,19 +103,20 @@ services.
 .. code:: python
 
     # The reply server binds to port 12345 and waits for incoming messages.
-    sock = bind(port=12345)
+    reply, listen_for_request = bind(port=12345).reply()
 
-    for msg in sock.listen_for_request():
+    for msg in listen_for_request:
         print(msg)
-        sock.reply(msg)
+        reply(msg)
 
 .. code:: python
 
     # The request client connects to localhost and sends three messages.
-    sock = connect(port=12345)
+    request, listen_for_reply = connect(port=12345).request()
 
-    for msg in ["Msg1", "Msg2", "Msg3"]:
-        response = sock.request_and_listen(msg.encode())
+    for msg in [b"Msg1", b"Msg2", b"Msg3"]:
+        request(msg)
+        response = next(listen_for_reply)
         print(response)
 
 Pair
@@ -129,19 +131,21 @@ expect one-to-one and bidirectional communication.
 .. code:: python
 
     # The pair server binds to port 12345 and waits for incoming messages.
-    sock = bind(port=12345)
+    pair, listen_for_pair = bind(port=12345).pair()
 
-    for msg in sock.listen_for_pair():
+    for msg in listen_for_pair:
         print(msg)
-        sock.pair(msg)
+        pair(msg)
 
 .. code:: python
 
     # The pair client connects to localhost and sends three messages.
-    sock = connect(port=12345)
+    pair, listen_for_pair = connect(port=12345).pair()
 
-    for msg in ["Msg1", "Msg2", "Msg3"]:
-        sock.pair(msg.encode())
+    for msg in [b"Msg1", b"Msg2", b"Msg3"]:
+        pair(msg)
+        response = next(listen_for_pair)
+        print(response)
 
 Logging
 -------

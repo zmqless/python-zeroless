@@ -2,6 +2,7 @@ import zmq
 import logging
 
 from time import sleep
+from functools import partial
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
@@ -14,105 +15,82 @@ def bind(port, interface='*'):
 
 class Sock:
     def __init__(self):
-        self._sock = None
-        self._context = zmq.Context()
+        pass
 
-    def __del__(self):
-        if self._sock:
-            self._sock.close()
+    def __sock(self, pattern):
+        sock = zmq.Context().instance().socket(pattern)
+        self._setup(sock)
 
-    def __sock(self, pattern, sleepTime=0):
-        if not self._sock:
-            self._sock = self._context.socket(pattern)
-            self._disable_patterns_except(pattern)
-            self.setup()
+        log.info('Ready...')
 
-            if pattern == zmq.SUB:
-                log.debug('[SUB] Sleeping for 5 seconds to avoid losing '
-                          'initial messages.')
-                self._sock.setsockopt(zmq.SUBSCRIBE, b'')
-                sleep(5)
-            elif pattern == zmq.PUB:
-                log.debug('[PUB] Sleeping for 5 seconds to avoid losing '
-                          'initial messages.')
-                sleep(5)
+        return sock
 
-            log.info('Ready...')
-
-        return self._sock
-
-    def __send(self, pattern, data):
-        return self.__sock(pattern).send_multipart(data)
-
-    def __recv(self, pattern):
-        frames = self.__sock(pattern).recv_multipart()
-        return frames if len(frames) > 1 else frames[0]
-
-    def _disable_patterns_except(self, pattern):
-        if not pattern == zmq.PUB: self.pub = None
-        if not pattern == zmq.SUB: self.listen_for_pub = None
-        if not pattern == zmq.PULL: self.listen_for_push = None
-        if not pattern == zmq.PUSH: self.push = None
-        if not pattern == zmq.REQ: self.request = None
-        if not pattern == zmq.REP:
-            self.reply = None
-            self.listen_for_request = None
-        if not pattern == zmq.PAIR:
-            self.pair = None
-            self.listen_for_pair = None
-
-    def pub(self, *data):
-        self.__send(zmq.PUB, data)
-        log.debug('[PUB] Sending: {0}'.format(data))
-
-    def listen_for_pub(self):
+    def __send(self, sock):
         while True:
-            data = self.__recv(zmq.SUB)
-            log.debug('[SUB] Receiving: {0}'.format(data))
-            yield data
+            data = (yield)
+            sock.send_multipart(data)
+            log.debug('Sending: {0}'.format(data))
 
-    def push(self, *data):
-        self.__send(zmq.PUSH, data)
-        log.debug('[PUSH] Sending: {0}'.format(data))
-
-    def listen_for_push(self):
+    def __send_with_prefix(self, sock, prefix_frames):
         while True:
-            data = self.__recv(zmq.PULL)
-            log.debug('[PULL] Receiving: {0}'.format(data))
-            yield data
+            data = prefix_frames + (yield)
+            sock.send_multipart(data)
+            log.debug('Sending: {0}'.format(data))
 
+    def __recv(self, sock):
+        while True:
+            frames = sock.recv_multipart()
+            log.debug('Receiving: {0}'.format(frames))
+            yield frames if len(frames) > 1 else frames[0]
+
+    def send_generator(self, sock, topic=None):
+        if topic:
+            gen = self.__send_with_prefix(sock, topic)
+        else:
+            gen = self.__send(sock)
+
+        gen.send(None)
+        func = lambda sender, *data: sender(data)
+        return partial(func, gen.send)
+
+    def recv_generator(self, sock):
+        return self.__recv(sock)
+
+    # PubSub pattern
+    def pub(self, topic=b''):
+        sock = self.__sock(zmq.PUB)
+        return self.send_generator(sock, (topic,))
+
+    def sub(self, topics=(b'',)):
+        sock = self.__sock(zmq.SUB)
+
+        for topic in topics:
+            sock.setsockopt(zmq.SUBSCRIBE, topic)
+
+        return self.recv_generator(sock)
+
+    # PushPull pattern
+    def push(self):
+        sock = self.__sock(zmq.PUSH)
+        return self.send_generator(sock)
+
+    def pull(self):
+        sock = self.__sock(zmq.PULL)
+        return self.recv_generator(sock)
+
+    # ReqRep pattern
     def request(self, *data):
-        self.__send(zmq.REQ, data)
-        log.debug('[REQUEST] Sending: {0}'.format(data))
+        sock = self.__sock(zmq.REQ)
+        return self.send_generator(sock), self.recv_generator(sock)
 
-    def request_and_listen(self, *data):
-        self.request(*data)
-        return next(self.listen_for_reply())
+    def reply(self):
+        sock = self.__sock(zmq.REP)
+        return self.send_generator(sock), self.recv_generator(sock)
 
-    def listen_for_reply(self):
-        data = self.__recv(zmq.REQ)
-        log.debug('[REQUEST] Receiving: {0}'.format(data))
-        yield data
-
-    def reply(self, *data):
-        self.__send(zmq.REP, data)
-        log.debug('[REPLY] Sending: {0}'.format(data))
-
-    def listen_for_request(self):
-        while True:
-            data = self.__recv(zmq.REP)
-            log.debug('[REPLY] Receiving: {0}'.format(data))
-            yield data
-
+    # Pair pattern
     def pair(self, *data):
-        self.__send(zmq.PAIR, data)
-        log.debug('[PAIR] Sending: {0}'.format(data))
-
-    def listen_for_pair(self):
-        while True:
-            data = self.__recv(zmq.PAIR)
-            log.debug('[PAIR] Receiving: {0}'.format(data))
-            yield data
+        sock = self.__sock(zmq.PAIR)
+        return self.send_generator(sock), self.recv_generator(sock)
 
     def setup(self):
         raise NotImplementedError()
@@ -124,10 +102,10 @@ class ConnectSock(Sock):
 
         Sock.__init__(self)
 
-    def setup(self):
+    def _setup(self, sock):
         log.info('Connecting to {0} on port {1}'.format(self._ip,
                                                         self._port))
-        self._sock.connect('tcp://' + self._ip + ':' + str(self._port))
+        sock.connect('tcp://' + self._ip + ':' + str(self._port))
 
 class BindSock(Sock):
     def __init__(self, interface, port):
@@ -136,7 +114,7 @@ class BindSock(Sock):
 
         Sock.__init__(self)
 
-    def setup(self):
+    def _setup(self, sock):
         log.info('Binding to interface {0} on port {1}'.format(self._interface,
                                                                self._port))
-        self._sock.bind('tcp://' + self._interface + ':' + str(self._port))
+        sock.bind('tcp://' + self._interface + ':' + str(self._port))

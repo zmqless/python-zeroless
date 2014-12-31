@@ -7,7 +7,7 @@ log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The push client connects to localhost and sends three messages.
-sock = connect(port=12345)
+push = connect(port=12345).push()
 
-for msg in ["Msg1", "Msg2", "Msg3"]:
-    sock.push(msg.encode())
+for msg in [b"Msg1", b"Msg2", b"Msg3"]:
+    push(msg)

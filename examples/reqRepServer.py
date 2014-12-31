@@ -7,8 +7,8 @@ log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The reply server binds to port 12345 and waits for incoming messages.
-sock = bind(port=12345)
+reply, listen_for_request = bind(port=12345).reply()
 
-for msg in sock.listen_for_request():
+for msg in listen_for_request:
     print(msg)
-    sock.reply(msg)
+    reply(msg)

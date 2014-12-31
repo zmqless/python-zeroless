@@ -7,8 +7,8 @@ log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The pair server binds to port 12345 and waits for incoming messages.
-sock = bind(port=12345)
+pair, listen_for_pair = bind(port=12345).pair()
 
-for msg in sock.listen_for_pair():
+for msg in listen_for_pair:
     print(msg)
-    sock.pair(msg)
+    pair(msg)

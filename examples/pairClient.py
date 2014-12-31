@@ -7,7 +7,9 @@ log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The pair client connects to localhost and sends three messages.
-sock = connect(port=12345)
+pair, listen_for_pair = connect(port=12345).pair()
 
-for msg in ["Msg1", "Msg2", "Msg3"]:
-    sock.pair(msg.encode())
+for msg in [b"Msg1", b"Msg2", b"Msg3"]:
+    pair(msg)
+    response = next(listen_for_pair)
+    print(response)

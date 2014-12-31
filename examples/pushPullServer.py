@@ -7,7 +7,7 @@ log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The pull server binds to port 12345 and waits for incoming messages.
-sock = bind(port=12345)
+listen_for_push = bind(port=12345).pull()
 
-for msg in sock.listen_for_push():
+for msg in listen_for_push:
     print(msg)
