@@ -34,7 +34,7 @@ class TestPushPull:
             result = next(listen_for_push)
             assert result == msg
 
-    def test_multiple_distribute_multipart(self, push, listen_for_push ):
+    def test_multiple_distribute_multipart(self, push, listen_for_push):
         msgs1 = [b'msg1' + bytes(i) for i in range(10)]
         msgs2 = [b'msg2' + bytes(i) for i in range(10)]
 
