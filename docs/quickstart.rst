@@ -1,27 +1,6 @@
-Zeroless
-========
+.. _quickstart:
 
-|Build Status| |Coverage Status|
-
-Yet another ØMQ_ wrapper for Python. However, differing from PyZMQ_, which
-tries to stay very close to the C++ implementation, this project aims to
-make distributed systems employing ØMQ_ as pythonic as possible.
-
-Being simpler to use, Zeroless doesn't supports all of the fine aspects
-and features of ØMQ_. However, you can expect to find all the message
-passing patterns you were accustomed to (i.e. pair, request/reply,
-publisher/subscriber, push/pull). Depite that, the only transport
-available is TCP, as threads are not as efficient in Python due to the
-GIL and IPC is unix-only.
-
-Installation
-------------
-
-.. code-block:: bash
-
-    $ pip install zeroless
-
-Python API
+Quickstart
 ----------
 
 In the ``zeroless`` module, two functions can be used to define how
@@ -149,61 +128,3 @@ expect one-to-one and bidirectional communication.
         pair(msg)
         response = next(listen_for_pair)
         print(response)
-
-Logging
--------
-
-The ``zeroless`` module allows logging via a global `Logger object <https://docs.python.org/3/library/logging.html#logger-objects>`__.
-
-.. code:: python
-
-    from zeroless import log
-
-To enable it, just add an `Handler object <https://docs.python.org/3/library/logging.html#handler-objects>`__ and set an appropriate `logging level <https://docs.python.org/3/library/logging.html#logging-levels>`__.
-
-Testing
--------
-
-To run individual tests:
-
-.. code-block:: bash
-
-    $ py.test tests/test_desired_module.py
-
-To run all the tests:
-
-.. code-block:: bash
-
-    $ python setup.py test
-
-Alternatively, you can use tox:
-
-.. code-block:: bash
-
-    $ tox
-
-License
--------
-
-Copyright 2014 Lucas Lira Gomes x8lucas8x@gmail.com
-
-This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2.1 of the License, or (at
-your option) any later version.
-
-This library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
-General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this library. If not, see http://www.gnu.org/licenses/.
-
-.. |Build Status| image:: https://travis-ci.org/zmqless/zeroless.svg?branch=master
-   :target: https://travis-ci.org/zmqless/zeroless
-.. |Coverage Status| image:: https://coveralls.io/repos/zmqless/zeroless/badge.png?branch=master
-   :target: https://coveralls.io/r/zmqless/zeroless?branch=master
-
-.. _ØMQ: http://www.zeromq.org
-.. _PyZMQ: https://www.github.com/zeromq/pyzmq
