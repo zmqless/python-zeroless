@@ -24,7 +24,7 @@ Installation
 Python API
 ----------
 
-In the ``zeroless`` module, two functions can be used to the define how
+In the ``zeroless`` module, two functions can be used to define how
 zeroless' sockets are related (i.e. ``bind`` and ``connect``). Both are
 able to create a *callable* and/or *iterable* socket, depending on the
 message passing pattern.

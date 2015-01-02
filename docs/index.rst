@@ -71,7 +71,7 @@ Development
 ===========
 
 We welcome contributions of any kind (ideas, code, tests, documentation, examples, ...).
-See the :doc:`development` for further details.
+See the :doc:`development` section for further details.
 
 Links
 =====
