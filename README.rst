@@ -1,7 +1,7 @@
 Zeroless
 ========
 
-|Build Status| |Coverage Status|
+|Build Status| |Coverage Status| |Codacy| |PyPi| |Docs| |License|
 
 Yet another ØMQ_ wrapper for Python. However, differing from PyZMQ_, which
 tries to stay very close to the C++ implementation, this project aims to
@@ -182,6 +182,11 @@ Alternatively, you can use tox:
 
     $ tox
 
+Need help?
+----------
+
+For more information, please see our documentation_.
+
 License
 -------
 
@@ -200,10 +205,19 @@ General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this library. If not, see http://www.gnu.org/licenses/.
 
-.. |Build Status| image:: https://travis-ci.org/zmqless/zeroless.svg?branch=master
+.. |Build Status| image:: https://img.shields.io/travis/zmqless/zeroless.svg?style=flat
    :target: https://travis-ci.org/zmqless/zeroless
-.. |Coverage Status| image:: https://coveralls.io/repos/zmqless/zeroless/badge.png?branch=master
+.. |Coverage Status| image:: https://img.shields.io/coveralls/zmqless/zeroless.svg?style=flat
    :target: https://coveralls.io/r/zmqless/zeroless?branch=master
+.. |Docs| image:: https://readthedocs.org/projects/zeroless/badge/?version=latest
+   :target: https://readthedocs.org/projects/zeroless/?badge=latest
+.. |License| image:: https://img.shields.io/pypi/l/zeroless.svg?style=flat
+   :target: https://www.gnu.org/licenses/lgpl-2.1.html
+.. |Codacy| image:: https://img.shields.io/codacy/116ada408f3c45709197e0e5d2fe46ba.svg?style=flat
+   :target: https://www.codacy.com/p/4364
+.. |PyPi| image:: https://img.shields.io/pypi/v/zeroless.svg?style=flat
+   :target: https://pypi.python.org/pypi/zeroless
 
 .. _ØMQ: http://www.zeromq.org
 .. _PyZMQ: https://www.github.com/zeromq/pyzmq
+.. _documentation: http://zeroless.readthedocs.org/en/latest/
