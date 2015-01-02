@@ -3,13 +3,12 @@ Zeroless
 
 |Build Status| |Coverage Status|
 
-Yet another `ZeroMQ <http://zeromq.org/>`__ wrapper for Python. However,
-differing from `pyzmq <https://github.com/zeromq/pyzmq>`__, which tries
-to stay very close to the C++ implementation, this project aims to make
-distributed systems employing 0MQ as pythonic as possible.
+Yet another ØMQ_ wrapper for Python. However, differing from PyZMQ_, which
+tries to stay very close to the C++ implementation, this project aims to
+make distributed systems employing ØMQ_ as pythonic as possible.
 
 Being simpler to use, Zeroless doesn't supports all of the fine aspects
-and features of 0MQ. However, you can expect to find all the message
+and features of ØMQ_. However, you can expect to find all the message
 passing patterns you were accustomed to (i.e. pair, request/reply,
 publisher/subscriber, push/pull). Depite that, the only transport
 available is TCP, as threads are not as efficient in Python due to the
@@ -205,3 +204,6 @@ along with this library. If not, see http://www.gnu.org/licenses/.
    :target: https://travis-ci.org/zmqless/zeroless
 .. |Coverage Status| image:: https://coveralls.io/repos/zmqless/zeroless/badge.png?branch=master
    :target: https://coveralls.io/r/zmqless/zeroless?branch=master
+
+.. _ØMQ: http://www.zeromq.org
+.. _PyZMQ: https://www.github.com/zeromq/pyzmq
