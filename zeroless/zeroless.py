@@ -184,7 +184,7 @@ class Sock:
         sock = self.__sock(zmq.PAIR)
         return self.__send_function(sock), self.__recv_generator(sock)
 
-    def _setup(self):
+    def _setup(self, sock):
         raise NotImplementedError()
 
 class ConnectSock(Sock):
