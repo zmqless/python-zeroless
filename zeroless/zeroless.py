@@ -17,6 +17,12 @@ from functools import partial
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
+def _check_valid_port_range(port):
+    if port < 1024 or port > 65535:
+        error = 'Port {0} is invalid, choose one between 1024 and 65535'
+        error = error.format(port)
+        raise ValueError(error)
+
 def connect(port, ip='127.0.0.1'):
     """
     Returns a connector socket object.
@@ -56,14 +62,24 @@ class Sock:
     def __send(self, sock):
         while True:
             data = (yield)
-            sock.send_multipart(data)
             log.debug('Sending: {0}'.format(data))
+
+            try:
+                sock.send_multipart(data)
+            except TypeError:
+                raise TypeError('Data must be bytes. Create another socket '
+                                'and try again.')
 
     def __send_with_prefix(self, sock, prefix_frames):
         while True:
             data = prefix_frames + (yield)
-            sock.send_multipart(data)
             log.debug('Sending: {0}'.format(data))
+
+            try:
+                sock.send_multipart(data)
+            except TypeError:
+                raise TypeError('Data must be bytes. Create another socket '
+                                'and try again.')
 
     def __recv(self, sock):
         while True:
@@ -96,6 +112,9 @@ class Sock:
         :type topic: bytes
         :rtype: function
         """
+        if not isinstance(topic, bytes):
+            raise TypeError('Topic must be bytes')
+
         sock = self.__sock(zmq.PUB)
         return self.__send_function(sock, (topic,))
 
@@ -112,6 +131,8 @@ class Sock:
         sock = self.__sock(zmq.SUB)
 
         for topic in topics:
+            if not isinstance(topic, bytes):
+                raise TypeError('Topics must be bytes')
             sock.setsockopt(zmq.SUBSCRIBE, topic)
 
         return self.__recv_generator(sock)
@@ -206,6 +227,8 @@ class ConnectSock(Sock):
         Sock.__init__(self)
 
     def _setup(self, sock):
+        _check_valid_port_range(self._port)
+
         log.info('Connecting to {0} on port {1}'.format(self._ip,
                                                         self._port))
         sock.connect('tcp://' + self._ip + ':' + str(self._port))
@@ -229,6 +252,8 @@ class BindSock(Sock):
         Sock.__init__(self)
 
     def _setup(self, sock):
+        _check_valid_port_range(self._port)
+
         if sock.socket_type == zmq.SUB:
             warning = 'SUB sockets that bind will not get any message before '
             warning += 'they first ask for via the provided generator, so '
@@ -238,4 +263,9 @@ class BindSock(Sock):
 
         log.info('Binding to interface {0} on port {1}'.format(self._interface,
                                                                self._port))
-        sock.bind('tcp://' + self._interface + ':' + str(self._port))
+
+        try:
+            sock.bind('tcp://' + self._interface + ':' + str(self._port))
+        except zmq.ZMQError:
+            error = 'Port {0} is already in use'.format(self._port)
+            raise ValueError(error)
