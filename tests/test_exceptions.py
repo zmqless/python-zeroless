@@ -56,3 +56,20 @@ class TestExceptions:
 
         with pytest.raises(TypeError):
             client.sub(topics=[b'topic1', u'topic2'])
+
+    def test_pair_client_cannot_connect_more_than_once(self):
+        client = Client()
+        client.connect_local(port=7200)
+        client.connect_local(port=7201)
+
+        with pytest.raises(RuntimeError):
+            client.pair()
+
+        client = Client()
+        client.connect_local(port=7200)
+
+        client.pair()
+
+        with pytest.raises(RuntimeError):
+            client.connect_local(port=7201)
+
