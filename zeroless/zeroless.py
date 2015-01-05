@@ -23,6 +23,11 @@ def _check_valid_port_range(port):
         error = error.format(port)
         raise ValueError(error)
 
+def _check_valid_num_connections(socket_type, num_connections):
+    if socket_type == zmq.PAIR and num_connections > 1:
+        error = 'A client cannot connect more than once in the PAIR pattern'
+        raise RuntimeError(error)
+
 def _connect_zmq_sock(sock, ip, port):
     log.info('Connecting to {0} on port {1}'.format(ip, port))
     sock.connect('tcp://' + ip + ':' + str(port))
@@ -206,6 +211,9 @@ class Client(Sock):
         self._sock = sock
         self._is_ready = True
 
+        _check_valid_num_connections(self._sock.socket_type,
+                                     len(self._addresses))
+
         for ip, port in self._addresses:
             _connect_zmq_sock(self._sock, ip, port)
 
@@ -224,6 +232,9 @@ class Client(Sock):
         self._addresses.append(address)
 
         if self._is_ready:
+            _check_valid_num_connections(self._sock.socket_type,
+                                         len(self._addresses))
+
             _connect_zmq_sock(self._sock, ip, port)
 
     def connect_local(self, port):
