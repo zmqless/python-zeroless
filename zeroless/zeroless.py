@@ -142,7 +142,7 @@ class Sock:
         return self.__recv_generator(sock)
 
     # ReqRep pattern
-    def request(self, *data):
+    def request(self):
         """
         Returns a callable and an iterable respectively. Those can be used to
         both transmit a message and/or iterate over incoming messages,
@@ -171,7 +171,7 @@ class Sock:
         return self.__send_function(sock), self.__recv_generator(sock)
 
     # Pair pattern
-    def pair(self, *data):
+    def pair(self):
         """
         Returns a callable and an iterable respectively. Those can be used to
         both transmit a message and/or iterate over incoming messages, that were
