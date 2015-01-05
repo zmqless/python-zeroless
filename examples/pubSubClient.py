@@ -2,14 +2,14 @@ import logging
 
 from time import sleep
 
-from zeroless import (bind, log)
+from zeroless import (Server, log)
 
 consoleHandler = logging.StreamHandler()
 log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
 # The publisher client connects to localhost and sends three messages.
-pub = bind(port=12345).pub(topic=b'sh')
+pub = Server(port=12345).pub(topic=b'sh')
 
 # Gives publisher some time to get initial subscriptions
 sleep(1)

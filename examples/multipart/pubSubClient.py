@@ -1,9 +1,9 @@
-from zeroless import bind
+from zeroless import Server
 
 from time import sleep
 
 # The publisher client connects to localhost and sends three messages.
-pub = bind(port=12345).pub()
+pub = Server(port=12345).pub()
 
 # Gives publisher some time to get initial subscriptions
 sleep(1)
