@@ -1,50 +1,58 @@
 import pytest
 
-from zeroless import(connect, bind)
+from zeroless import(Server, Client)
 
 class TestExceptions:
     def test_port_under_range(self):
+        client = Client()
         with pytest.raises(ValueError):
-            connect(1023).pull()
+           client.connect_local(port=1023)
 
         with pytest.raises(ValueError):
-            bind(1023).pull()
+            Server(port=1023)
 
     def test_port_on_range(self):
-        sock1 = connect(1024).pull()
-        sock2 = connect(7000).pull()
-        sock3 = connect(65535).pull()
+        client = Client()
+        client.connect_local(port=1024)
+        client.connect_local(port=7000)
+        client.connect_local(port=65535)
 
     def test_port_after_range(self):
+        client = Client()
         with pytest.raises(ValueError):
-            connect(65536).pull()
+            client.connect_local(port=65536)
 
         with pytest.raises(ValueError):
-            bind(65536).pull()
+            Server(port=65536)
 
     def test_port_already_used(self):
-        sock1 = bind(65000).pull()
+        server1 = Server(port=65000).pull()
 
         with pytest.raises(ValueError):
-            bind(65000).pull()
+            Server(port=65000).pull()
 
     def test_data_is_not_bytes(self):
-        push = connect(7050).push()
+        client = Client()
+        client.connect_local(port=7050)
+        push = client.push()
 
         with pytest.raises(TypeError):
             push(u'msg')
 
     def test_published_topic_is_not_bytes(self):
-        bind(7099).pub(topic=b'topic1')
+        Server(port=7099).pub(topic=b'topic1')
 
         with pytest.raises(TypeError):
-            bind(7100).pub(topic=u'topic1')
+            Server(port=7100).pub(topic=u'topic1')
 
     def test_subscribed_topics_are_not_bytes(self):
-        connect(7099).sub(topics=[b'topic1'])
+        client = Client()
+        client.connect_local(port=7099)
+
+        client.sub(topics=[b'topic1'])
 
         with pytest.raises(TypeError):
-            connect(7100).sub(topics=[u'topic1'])
+            client.sub(topics=[u'topic1'])
 
         with pytest.raises(TypeError):
-            connect(7101).sub(topics=[b'topic1', u'topic2'])
+            client.sub(topics=[b'topic1', u'topic2'])

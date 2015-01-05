@@ -1,15 +1,17 @@
 import pytest
 
-from zeroless import (bind, connect)
+from zeroless import (Server, Client)
 
 @pytest.fixture(scope="module")
 def listen_for_pair():
-    _, listen = bind(port=7890).pair()
+    _, listen = Server(port=7890).pair()
     return listen
 
 @pytest.fixture(scope="module")
 def pair():
-    send, _ = connect(port=7890).pair()
+    client = Client()
+    client.connect_local(port=7890)
+    send, _ = client.pair()
     return send
 
 class TestPair:

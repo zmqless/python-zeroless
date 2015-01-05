@@ -1,14 +1,16 @@
 import pytest
 
-from zeroless import (bind, connect)
+from zeroless import (Server, Client)
 
 @pytest.fixture(scope="module")
 def reply_gens():
-    return bind(port=7892).reply()
+    return Server(port=7892).reply()
 
 @pytest.fixture(scope="module")
 def request_gens():
-    return connect(port=7892).request()
+    client = Client()
+    client.connect_local(port=7892)
+    return client.request()
 
 class TestReqRep:
     def test_ping_pong(self, request_gens, reply_gens):
