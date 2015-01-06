@@ -2,7 +2,8 @@ from zeroless import Server
 
 from time import sleep
 
-# The publisher client connects to localhost and sends three messages.
+# Binds the publisher server to port 12345
+# And assigns a callable to publish messages with no topic specified
 pub = Server(port=12345).pub()
 
 # Gives publisher some time to get initial subscriptions

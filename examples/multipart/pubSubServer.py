@@ -1,9 +1,11 @@
 from zeroless import Client
 
+# Connects the client to as many servers as desired
 client = Client()
 client.connect_local(port=12345)
 
-# The subscriber server binds to port 12345 and waits for incoming messages.
+# Initiate a subscriber client
+# Assigns an iterable to wait for incoming messages with any topic
 listen_for_pub = client.sub()
 
 for topic, id, msg in listen_for_pub:
