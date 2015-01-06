@@ -34,10 +34,9 @@ Code Style Guide
 Testing
 -------
 
-Tests are implemented using the ``py.test`` framework and are located
-in the tests/ directory. Their module name typically resembles the full
-path of the module they're testing. However, we recommend the usage of
-``tox`` as it will test our codebase against both Python 2.7 and 3.0.
+Tests make use of the ``py.test`` framework and are located in the tests/
+folder. However, we recommend the usage of ``tox`` as it will test our
+codebase against both Python 2.7 and 3.0.
 
 .. include:: ../README.rst
    :start-after: _testing_content_start:

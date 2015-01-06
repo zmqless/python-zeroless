@@ -3,7 +3,9 @@
 Zeroless
 ========
 
-|Build Status| |Coverage Status| |Codacy| |PyPi| |Docs| |License|
+.. include:: ../README.rst
+   :start-after: _badges_start:
+   :end-before:  _badges_end:
 
 This documentation contains notes on some important aspects of developing Zeroless
 and an overview of Zeroless' API. For information on how to use ØMQ_ in general,
@@ -34,9 +36,9 @@ Installing
 
 Install stable releases of Zeroless with ``pip``.
 
-.. code-block:: bash
-
-    $ pip install zeroless
+.. include:: ../README.rst
+   :start-after: _install_content_start:
+   :end-before:  _install_content_end:
 
 See the :doc:`install` for more detail.
 
