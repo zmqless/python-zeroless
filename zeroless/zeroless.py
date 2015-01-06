@@ -130,7 +130,7 @@ class Sock:
         with an infinite number of arguments. Each one being a part of the
         complete message.
 
-        :rtype: a function
+        :rtype: function
         """
         sock = self.__sock(zmq.PUSH)
         return self.__send_function(sock)
