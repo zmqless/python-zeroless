@@ -3,128 +3,102 @@
 Quickstart
 ----------
 
-In the ``zeroless`` module, two functions can be used to define how
-zeroless' sockets are related (i.e. ``bind`` and ``connect``). Both are
-able to create a *callable* and/or *iterable* socket, depending on the
-message passing pattern.
+.. include:: ../README.rst
+   :start-after: _python_api_content_start:
+   :end-before:  _python_api_content_end:
 
-So that you can iterate over incoming messages and/or call to transmit a
-message.
+Message Passing Patterns
+------------------------
 
-All examples assume:
-
-.. code:: python
-
-    from zeroless import (connect, bind)
+Zeroless supports the following message passing patterns:
 
 Push-Pull
 ~~~~~~~~~
 
-Useful for distributing the workload among a set of workers. A common
-pattern in the Stream Processing field, being the cornestone of
-applications like Apache Storm for instance. Also, it can be seen as a
-generalisation of the Map-Reduce pattern.
+.. include:: ../README.rst
+   :start-after: _push_pull_content_start:
+   :end-before:  _push_pull_content_end:
 
-.. code:: python
+.. literalinclude:: ../examples/pushPullServer.py
+   :language: python 
 
-    # The pull server binds to port 12345 and waits for incoming messages.
-    listen_for_push = bind(port=12345).pull()
-
-    for msg in listen_for_push:
-        print(msg)
-
-.. code:: python
-
-    # The push client connects to localhost and sends three messages.
-    push = connect(port=12345).push()
-
-    for msg in [b"Msg1", b"Msg2", b"Msg3"]:
-        push(msg)
+.. literalinclude:: ../examples/pushPullClient.py
+   :language: python 
 
 Publisher-Subscriber
 ~~~~~~~~~~~~~~~~~~~~
 
-Useful for broadcasting messages to a set of peers. A common pattern for
-allowing real-time notifications at the client side, without having to
-resort to inneficient approaches like pooling. Online services like
-PubNub or IoT protocols like MQTT are examples of this pattern usage.
+.. include:: ../README.rst
+   :start-after: _pub_sub_content_start:
+   :end-before:  _pub_sub_content_end:
 
-.. code:: python
+.. literalinclude:: ../examples/pubSubServer.py
+   :language: python 
 
-    # The publisher server connects to localhost and sends three messages.
-    pub = bind(port=12345).pub(topic=b'sh')
+.. literalinclude:: ../examples/pubSubClient.py
+   :language: python 
 
-    # Gives publisher some time to get initial subscriptions
-    sleep(1)
-
-    for msg in [b"Msg1", b"Msg2", b"Msg3"]:
-        pub(msg)
-
-.. code:: python
-
-    # The subscriber client binds to port 12345 and waits for incoming messages.
-    listen_for_pub = connect(port=12345).sub(topics=[b'sh'])
-
-    for topic, msg in listen_for_pub:
-        print(topic, ' - ', msg)
-
-Note: ZMQ's topic filtering capabilities are publisher side since ZMQ 3.0.
-
-Last but not least, SUB sockets that bind will not get any message before they
-first ask for via the provided generator, so prefer to bind PUB sockets if
-missing some messages is not an option.
+.. include:: ../README.rst
+   :start-after: _pub_sub_appendix_start:
+   :end-before:  _pub_sub_appendix_end:
 
 Request-Reply
 ~~~~~~~~~~~~~
 
-Useful for RPC style calls. A common pattern for clients to request data
-and receive a response associated with the request. The HTTP protocol is
-well-known for adopting this pattern, being it essential for Restful
-services.
+.. include:: ../README.rst
+   :start-after: _req_rep_content_start:
+   :end-before:  _req_rep_content_end:
 
-.. code:: python
+.. literalinclude:: ../examples/reqRepServer.py
+   :language: python 
 
-    # The reply server binds to port 12345 and waits for incoming messages.
-    reply, listen_for_request = bind(port=12345).reply()
-
-    for msg in listen_for_request:
-        print(msg)
-        reply(msg)
-
-.. code:: python
-
-    # The request client connects to localhost and sends three messages.
-    request, listen_for_reply = connect(port=12345).request()
-
-    for msg in [b"Msg1", b"Msg2", b"Msg3"]:
-        request(msg)
-        response = next(listen_for_reply)
-        print(response)
+.. literalinclude:: ../examples/reqRepClient.py
+   :language: python 
 
 Pair
 ~~~~
 
-More often than not, this pattern will be unnecessary, as the above ones
-or the mix of them suffices most use cases in distributed computing.
-Regarding its capabilities, this pattern is the most similar alternative
-to usual posix sockets among the aforementioned patterns. Therefore,
-expect one-to-one and bidirectional communication.
+.. include:: ../README.rst
+   :start-after: _pair_content_start:
+   :end-before:  _pair_content_end:
 
-.. code:: python
+.. literalinclude:: ../examples/pairServer.py
+   :language: python 
 
-    # The pair server binds to port 12345 and waits for incoming messages.
-    pair, listen_for_pair = bind(port=12345).pair()
+.. literalinclude:: ../examples/pairClient.py
+   :language: python 
 
-    for msg in listen_for_pair:
-        print(msg)
-        pair(msg)
+Additional Features
+-------------------
 
-.. code:: python
+Logging
+~~~~~~~
 
-    # The pair client connects to localhost and sends three messages.
-    pair, listen_for_pair = connect(port=12345).pair()
+Python provides a wonderfull ``logging`` module. It can be used to track
+Zeroless' internal workflow in a modular way, therefore being very useful
+for debugging purposes.
 
-    for msg in [b"Msg1", b"Msg2", b"Msg3"]:
-        pair(msg)
-        response = next(listen_for_pair)
-        print(response)
+.. include:: ../README.rst
+   :start-after: _logging_content_start:
+   :end-before:  _logging_content_end:
+
+Multipart Messages
+~~~~~~~~~~~~~~~~~~
+
+In the Zeroless API, all *callables* have a ``print`` like signature, therefore
+being able to have an infinite number of arguments. Each of these arguments are
+part of the whole message, that could be divided in multiple pieces. Being that
+useful when you have a simple message structure, with just a few fields, and
+don't want to rely on a data formatting standard (e.g. JSoN, XML) to maintain
+the message semantics. Also, given the need to parse those different parts that
+a single message may have, the receiver's *iterable* will return them all, at
+once, in transparent fashion.
+
+For more on this, see the examples/multipart folder or check the following
+example:
+
+.. literalinclude:: ../examples/multipart/pushPullServer.py
+   :language: python 
+
+.. literalinclude:: ../examples/multipart/pushPullClient.py
+   :language: python 

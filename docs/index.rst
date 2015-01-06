@@ -3,6 +3,10 @@
 Zeroless
 ========
 
+.. include:: ../README.rst
+   :start-after: _badges_start:
+   :end-before:  _badges_end:
+
 This documentation contains notes on some important aspects of developing Zeroless
 and an overview of Zeroless' API. For information on how to use ØMQ_ in general,
 see the many examples in the excellent ØMQGuide_. It can give a better understanding
@@ -32,9 +36,9 @@ Installing
 
 Install stable releases of Zeroless with ``pip``.
 
-.. code-block:: bash
-
-    $ pip install zeroless
+.. include:: ../README.rst
+   :start-after: _install_content_start:
+   :end-before:  _install_content_end:
 
 See the :doc:`install` for more detail.
 
@@ -82,9 +86,31 @@ Links
 * Zeroless on PyPy_
 * Issue Tracker_
 
+License
+=======
+
+.. include:: ../README.rst
+   :start-after: _license_content_start:
+   :end-before:  _license_content_end:
+
+.. |Build Status| image:: https://img.shields.io/travis/zmqless/zeroless.svg?style=flat
+   :target: https://travis-ci.org/zmqless/zeroless
+.. |Coverage Status| image:: https://img.shields.io/coveralls/zmqless/zeroless.svg?style=flat
+   :target: https://coveralls.io/r/zmqless/zeroless?branch=master
+.. |Docs| image:: https://readthedocs.org/projects/zeroless/badge/?version=latest
+   :target: https://readthedocs.org/projects/zeroless/?badge=latest
+.. |License| image:: https://img.shields.io/pypi/l/zeroless.svg?style=flat
+   :target: https://www.gnu.org/licenses/lgpl-2.1.html
+.. |Codacy| image:: https://img.shields.io/codacy/116ada408f3c45709197e0e5d2fe46ba.svg?style=flat
+   :target: https://www.codacy.com/p/4364
+.. |PyPi| image:: https://img.shields.io/pypi/v/zeroless.svg?style=flat
+   :target: https://pypi.python.org/pypi/zeroless
+
 .. _ØMQ: http://www.zeromq.org
 .. _ØMQGuide: http://zguide.zeromq.org
 .. _PyZMQ: https://www.github.com/zeromq/pyzmq
 .. _GitHub: https://github.com/zmqless/zeroless 
 .. _Tracker: https://github.com/zmqless/zeroless/issues
 .. _PyPy: https://pypi.python.org/pypi/zeroless
+
+

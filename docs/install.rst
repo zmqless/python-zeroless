@@ -5,9 +5,9 @@ Install Guide
 
 Install stable releases of Zeroless with ``pip``.
 
-.. code-block:: bash
-
-    $ pip install zeroless
+.. include:: ../README.rst
+   :start-after: _install_content_start:
+   :end-before:  _install_content_end:
 
 .. _install_dependencies:
 

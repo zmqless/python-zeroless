@@ -1,14 +1,16 @@
 import pytest
 
-from zeroless import (bind, connect)
+from zeroless import (Server, Client)
 
 @pytest.fixture(scope="module")
 def listen_for_push():
-    return bind(port=7891).pull()
+    return Server(port=7891).pull()
 
 @pytest.fixture(scope="module")
 def push():
-    return connect(port=7891).push()
+    client = Client()
+    client.connect_local(port=7891)
+    return client.push()
 
 class TestPushPull:
     def test_distribute(self, push, listen_for_push):

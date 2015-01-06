@@ -19,7 +19,7 @@ def readme():
         return f.read()
 
 setup(name='zeroless',
-      version='0.3.0',
+      version='0.4.0',
       description='A pythonic approach for distributed systems with ZeroMQ.',
       long_description=readme(),
       classifiers=[

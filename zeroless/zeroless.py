@@ -23,29 +23,42 @@ def _check_valid_port_range(port):
         error = error.format(port)
         raise ValueError(error)
 
-def connect(port, ip='127.0.0.1'):
-    """
-    Returns a connector socket object.
+def _check_valid_num_connections(socket_type, num_connections):
+    if socket_type == zmq.PAIR and num_connections > 1:
+        error = 'A client cannot connect more than once in the PAIR pattern'
+        raise RuntimeError(error)
 
-    :param port: port number from 1024 up to 65535
-    :type port: int
-    :param ip: ip address to connect (default=127.0.0.1)
-    :type ip: str or unicode
-    :rtype: ConnectSock
-    """
-    return ConnectSock(ip, port)
+def _connect_zmq_sock(sock, ip, port):
+    log.info('Connecting to {0} on port {1}'.format(ip, port))
+    sock.connect('tcp://' + ip + ':' + str(port))
 
-def bind(port, interface='*'):
-    """
-    Returns a binding socket object.
+def _send(sock):
+    while True:
+        data = (yield)
+        log.debug('Sending: {0}'.format(data))
 
-    :param port: port number from 1024 up to 65535
-    :type port: int
-    :param interface: interface to bind (default=*)
-    :type interface: str or unicode
-    :rtype: BindSock
-    """
-    return BindSock(interface, port)
+        try:
+            sock.send_multipart(data)
+        except TypeError:
+            raise TypeError('Data must be bytes. Create another socket '
+                            'and try again.')
+
+def _send_with_prefix(sock, prefix_frames):
+    while True:
+        data = prefix_frames + (yield)
+        log.debug('Sending: {0}'.format(data))
+
+        try:
+            sock.send_multipart(data)
+        except TypeError:
+            raise TypeError('Data must be bytes. Create another socket '
+                            'and try again.')
+
+def _recv(sock):
+    while True:
+        frames = sock.recv_multipart()
+        log.debug('Receiving: {0}'.format(frames))
+        yield frames if len(frames) > 1 else frames[0]
 
 class Sock:
     def __init__(self):
@@ -59,46 +72,18 @@ class Sock:
 
         return sock
 
-    def __send(self, sock):
-        while True:
-            data = (yield)
-            log.debug('Sending: {0}'.format(data))
-
-            try:
-                sock.send_multipart(data)
-            except TypeError:
-                raise TypeError('Data must be bytes. Create another socket '
-                                'and try again.')
-
-    def __send_with_prefix(self, sock, prefix_frames):
-        while True:
-            data = prefix_frames + (yield)
-            log.debug('Sending: {0}'.format(data))
-
-            try:
-                sock.send_multipart(data)
-            except TypeError:
-                raise TypeError('Data must be bytes. Create another socket '
-                                'and try again.')
-
-    def __recv(self, sock):
-        while True:
-            frames = sock.recv_multipart()
-            log.debug('Receiving: {0}'.format(frames))
-            yield frames if len(frames) > 1 else frames[0]
-
     def __send_function(self, sock, topic=None):
         if topic:
-            gen = self.__send_with_prefix(sock, topic)
+            gen = _send_with_prefix(sock, topic)
         else:
-            gen = self.__send(sock)
+            gen = _send(sock)
 
         gen.send(None)
         func = lambda sender, *data: sender(data)
         return partial(func, gen.send)
 
     def __recv_generator(self, sock):
-        return self.__recv(sock)
+        return _recv(sock)
 
     # PubSub pattern
     def pub(self, topic=b''):
@@ -145,7 +130,7 @@ class Sock:
         with an infinite number of arguments. Each one being a part of the
         complete message.
 
-        :rtype: a function
+        :rtype: function
         """
         sock = self.__sock(zmq.PUSH)
         return self.__send_function(sock)
@@ -162,7 +147,7 @@ class Sock:
         return self.__recv_generator(sock)
 
     # ReqRep pattern
-    def request(self, *data):
+    def request(self):
         """
         Returns a callable and an iterable respectively. Those can be used to
         both transmit a message and/or iterate over incoming messages,
@@ -191,7 +176,7 @@ class Sock:
         return self.__send_function(sock), self.__recv_generator(sock)
 
     # Pair pattern
-    def pair(self, *data):
+    def pair(self):
         """
         Returns a callable and an iterable respectively. Those can be used to
         both transmit a message and/or iterate over incoming messages, that were
@@ -208,52 +193,76 @@ class Sock:
     def _setup(self, sock):
         raise NotImplementedError()
 
-class ConnectSock(Sock):
+class Client(Sock):
     """
-    A socket that will connect to a binding socket.
+    A client that can connect to a set of servers.
     """
-    def __init__(self, ip, port):
+    def __init__(self):
         """
-        Constructor of the connector socket.
+        Constructor of the Client.
+        """
+        self._sock = None
+        self._is_ready = False
+        self._addresses = []
 
-        :param port: port number from 1024 up to 65535
-        :type port: int
-        :param ip: ip address to connect
+        Sock.__init__(self)
+
+    def _setup(self, sock):
+        self._sock = sock
+        self._is_ready = True
+
+        _check_valid_num_connections(self._sock.socket_type,
+                                     len(self._addresses))
+
+        for ip, port in self._addresses:
+            _connect_zmq_sock(self._sock, ip, port)
+
+    def connect(self, ip, port):
+        """
+        Connects to a server at the specified ip and port.
+
+        :param ip: an IP address
         :type ip: str or unicode
+        :param port: port number from 1024 up to 65535
+        :type port: int
         """
-        self._ip = ip
-        self._port = port
+        _check_valid_port_range(port)
 
-        Sock.__init__(self)
+        address = (ip, port)
+        self._addresses.append(address)
 
-    def _setup(self, sock):
-        _check_valid_port_range(self._port)
+        if self._is_ready:
+            _check_valid_num_connections(self._sock.socket_type,
+                                         len(self._addresses))
 
-        log.info('Connecting to {0} on port {1}'.format(self._ip,
-                                                        self._port))
-        sock.connect('tcp://' + self._ip + ':' + str(self._port))
+            _connect_zmq_sock(self._sock, ip, port)
 
-class BindSock(Sock):
-    """
-    A socket that will bind for others to connect.
-    """
-    def __init__(self, interface, port):
+    def connect_local(self, port):
         """
-        Constructor of the binder object.
+        Connects to a server from localhost at the specified port.
 
         :param port: port number from 1024 up to 65535
         :type port: int
-        :param interface: interface to bind
-        :type interface: str or unicode
         """
-        self._interface = interface
+        self.connect('127.0.0.1', port)
+
+class Server(Sock):
+    """
+    A server that clients can connect to.
+    """
+    def __init__(self, port):
+        """
+        Constructor of the Server.
+
+        :param port: port number from 1024 up to 65535
+        :type port: int
+        """
+        _check_valid_port_range(port)
         self._port = port
 
         Sock.__init__(self)
 
     def _setup(self, sock):
-        _check_valid_port_range(self._port)
-
         if sock.socket_type == zmq.SUB:
             warning = 'SUB sockets that bind will not get any message before '
             warning += 'they first ask for via the provided generator, so '
@@ -261,11 +270,10 @@ class BindSock(Sock):
             warning += 'is not an option'
             warn(warning)
 
-        log.info('Binding to interface {0} on port {1}'.format(self._interface,
-                                                               self._port))
+        log.info('Binding on port {0}'.format(self._port))
 
         try:
-            sock.bind('tcp://' + self._interface + ':' + str(self._port))
+            sock.bind('tcp://*:' + str(self._port))
         except zmq.ZMQError:
             error = 'Port {0} is already in use'.format(self._port)
             raise ValueError(error)

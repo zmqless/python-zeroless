@@ -1,13 +1,20 @@
 import logging
 
-from zeroless import (connect, log)
+from zeroless import (Client, log)
 
+# Setup console logging
 consoleHandler = logging.StreamHandler()
 log.setLevel(logging.DEBUG)
 log.addHandler(consoleHandler)
 
-# The pair client connects to localhost and sends three messages.
-pair, listen_for_pair = connect(port=12345).pair()
+# Connects the client to a single server
+client = Client()
+client.connect_local(port=12345)
+
+# Initiate a pair client
+# And assigns a callable and an iterable
+# To both transmit and wait for incoming messages
+pair, listen_for_pair = client.pair()
 
 for msg in [b"Msg1", b"Msg2", b"Msg3"]:
     pair(msg)
