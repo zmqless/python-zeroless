@@ -1,7 +1,11 @@
 Zeroless
 ========
 
+.. _badges_start:
+
 |Build Status| |Coverage Status| |Codacy| |PyPi| |Docs| |License|
+
+.. _badges_end:
 
 Yet another ØMQ_ wrapper for Python. However, differing from PyZMQ_, which
 tries to stay very close to the C++ implementation, this project aims to
@@ -17,9 +21,13 @@ GIL and IPC is unix-only.
 Installation
 ------------
 
+.. _install_content_start:
+
 .. code-block:: bash
 
     $ pip install zeroless
+
+.. _install_content_end:
 
 Python API
 ----------
