@@ -24,19 +24,20 @@ Installation
 Python API
 ----------
 
-In the ``zeroless`` module, two functions can be used to define how
-zeroless' sockets are related (i.e. ``bind`` and ``connect``). Both are
-able to create a *callable* and/or *iterable* socket, depending on the
-message passing pattern.
+In the ``zeroless`` module, two classes can be used to define how distributed
+entities are related (i.e. ``Server`` and ``Client``). To put it bluntly, with
+the exception of the pair pattern, a client may be connected to multiple
+servers, while a server may accept incoming connections from multiple clients.
 
-So that you can iterate over incoming messages and/or call to transmit a
-message.
+Both servers and clients are able to create a *callable* and/or *iterable*,
+depending on the message passing pattern. So that you can iterate over incoming
+messages and/or call to transmit a message.
 
 All examples assume:
 
 .. code:: python
 
-    from zeroless import (connect, bind)
+    from zeroless import (Server, Client)
 
 Push-Pull
 ~~~~~~~~~
@@ -48,16 +49,22 @@ generalisation of the Map-Reduce pattern.
 
 .. code:: python
 
-    # The pull server binds to port 12345 and waits for incoming messages.
-    listen_for_push = bind(port=12345).pull()
+    # Binds the pull server to port 12345
+    # And assigns an iterable to wait for incoming messages
+    listen_for_push = Server(port=12345).pull()
 
     for msg in listen_for_push:
         print(msg)
 
 .. code:: python
 
-    # The push client connects to localhost and sends three messages.
-    push = connect(port=12345).push()
+    # Connects the client to as many servers as desired
+    client = Client()
+    client.connect_local(port=12345)
+
+    # Initiate a push client
+    # And assigns a callable to push messages
+    push = client.push()
 
     for msg in [b"Msg1", b"Msg2", b"Msg3"]:
         push(msg)
@@ -72,8 +79,9 @@ PubNub or IoT protocols like MQTT are examples of this pattern usage.
 
 .. code:: python
 
-    # The publisher server connects to localhost and sends three messages.
-    pub = bind(port=12345).pub(topic=b'sh')
+    # Binds the publisher server to port 12345
+    # And assigns a callable to publish messages with the topic 'sh'
+    pub = Server(port=12345).pub(topic=b'sh')
 
     # Gives publisher some time to get initial subscriptions
     sleep(1)
@@ -83,8 +91,13 @@ PubNub or IoT protocols like MQTT are examples of this pattern usage.
 
 .. code:: python
 
-    # The subscriber client binds to port 12345 and waits for incoming messages.
-    listen_for_pub = connect(port=12345).sub(topics=[b'sh'])
+    # Connects the client to as many servers as desired
+    client = Client()
+    client.connect_local(port=12345)
+
+    # Initiate a subscriber client
+    # Assigns an iterable to wait for incoming messages with the topic 'sh'
+    listen_for_pub = client.sub(topics=[b'sh'])
 
     for topic, msg in listen_for_pub:
         print(topic, ' - ', msg)
@@ -105,8 +118,10 @@ services.
 
 .. code:: python
 
-    # The reply server binds to port 12345 and waits for incoming messages.
-    reply, listen_for_request = bind(port=12345).reply()
+    # Binds the reply server to port 12345
+    # And assigns a callable and an iterable
+    # To both transmit and wait for incoming messages
+    reply, listen_for_request = Server(port=12345).reply()
 
     for msg in listen_for_request:
         print(msg)
@@ -114,8 +129,14 @@ services.
 
 .. code:: python
 
-    # The request client connects to localhost and sends three messages.
-    request, listen_for_reply = connect(port=12345).request()
+    # Connects the client to as many servers as desired
+    client = Client()
+    client.connect_local(port=12345)
+
+    # Initiate a request client
+    # And assigns a callable and an iterable
+    # To both transmit and wait for incoming messages
+    request, listen_for_reply = client.request()
 
     for msg in [b"Msg1", b"Msg2", b"Msg3"]:
         request(msg)
@@ -133,8 +154,10 @@ expect one-to-one and bidirectional communication.
 
 .. code:: python
 
-    # The pair server binds to port 12345 and waits for incoming messages.
-    pair, listen_for_pair = bind(port=12345).pair()
+    # Binds the pair server to port 12345
+    # And assigns a callable and an iterable
+    # To both transmit and wait for incoming messages
+    pair, listen_for_pair = Server(port=12345).pair()
 
     for msg in listen_for_pair:
         print(msg)
@@ -142,8 +165,14 @@ expect one-to-one and bidirectional communication.
 
 .. code:: python
 
-    # The pair client connects to localhost and sends three messages.
-    pair, listen_for_pair = connect(port=12345).pair()
+    # Connects the client to a single server
+    client = Client()
+    client.connect_local(port=12345)
+
+    # Initiate a pair client
+    # And assigns a callable and an iterable
+    # To both transmit and wait for incoming messages
+    pair, listen_for_pair = client.pair()
 
     for msg in [b"Msg1", b"Msg2", b"Msg3"]:
         pair(msg)
