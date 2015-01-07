@@ -20,7 +20,7 @@ def readme():
 
 setup(name='zeroless',
       version='0.4.0',
-      description='A pythonic approach for distributed systems with ZeroMQ.',
+      description='ZeroMQ for Pythonistas™',
       long_description=readme(),
       classifiers=[
           'Development Status :: 3 - Alpha',
