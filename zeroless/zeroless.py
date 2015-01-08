@@ -34,6 +34,16 @@ def _connect_zmq_sock(sock, ip, port):
     log.info('Connecting to {0} on port {1}'.format(ip, port))
     sock.connect('tcp://' + ip + ':' + str(port))
 
+def _bind_zmq_sock(sock, port):
+    log.info('Binding on port {0}'.format(port))
+
+    try:
+        sock.bind('tcp://*:' + str(port))
+    except zmq.ZMQError:
+        error = 'Port {0} is already in use'.format(port)
+        log.exception(error)
+        raise ValueError(error)
+
 def _recv(sock):
     while True:
         frames = sock.recv_multipart()
@@ -263,11 +273,6 @@ class Server(Sock):
             warning += 'is not an option'
             warn(warning)
 
-        log.info('Binding on port {0}'.format(self._port))
+        _bind_zmq_sock(sock, self._port)
 
-        try:
-            sock.bind('tcp://*:' + str(self._port))
-        except zmq.ZMQError:
-            error = 'Port {0} is already in use'.format(self._port)
-            log.exception(error)
-            raise ValueError(error)
+
