@@ -21,11 +21,13 @@ def _check_valid_port_range(port):
     if port < 1024 or port > 65535:
         error = 'Port {0} is invalid, choose one between 1024 and 65535'
         error = error.format(port)
+        log.error(error)
         raise ValueError(error)
 
 def _check_valid_num_connections(socket_type, num_connections):
     if socket_type == zmq.PAIR and num_connections > 1:
         error = 'A client cannot connect more than once in the PAIR pattern'
+        log.error(error)
         raise RuntimeError(error)
 
 def _connect_zmq_sock(sock, ip, port):
@@ -40,8 +42,9 @@ def _send(sock):
         try:
             sock.send_multipart(data)
         except TypeError:
-            raise TypeError('Data must be bytes. Create another socket '
-                            'and try again.')
+            error = 'Data must be bytes, so create another socket and try again'
+            log.exception(error)
+            raise TypeError(error)
 
 def _send_with_prefix(sock, prefix_frames):
     while True:
@@ -51,8 +54,9 @@ def _send_with_prefix(sock, prefix_frames):
         try:
             sock.send_multipart(data)
         except TypeError:
-            raise TypeError('Data must be bytes. Create another socket '
-                            'and try again.')
+            error = 'Data must be bytes, so create another socket and try again'
+            log.exception(error)
+            raise TypeError(error)
 
 def _recv(sock):
     while True:
@@ -98,7 +102,9 @@ class Sock:
         :rtype: function
         """
         if not isinstance(topic, bytes):
-            raise TypeError('Topic must be bytes')
+            error = 'Topic must be bytes'
+            log.error(error)
+            raise TypeError(error)
 
         sock = self.__sock(zmq.PUB)
         return self.__send_function(sock, (topic,))
@@ -117,7 +123,9 @@ class Sock:
 
         for topic in topics:
             if not isinstance(topic, bytes):
-                raise TypeError('Topics must be bytes')
+                error = 'Topics must be a list of bytes'
+                log.error(error)
+                raise TypeError(error)
             sock.setsockopt(zmq.SUBSCRIBE, topic)
 
         return self.__recv_generator(sock)
@@ -276,4 +284,5 @@ class Server(Sock):
             sock.bind('tcp://*:' + str(self._port))
         except zmq.ZMQError:
             error = 'Port {0} is already in use'.format(self._port)
+            log.exception(error)
             raise ValueError(error)
