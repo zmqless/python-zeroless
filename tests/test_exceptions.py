@@ -72,4 +72,3 @@ class TestExceptions:
 
         with pytest.raises(RuntimeError):
             client.connect_local(port=7201)
-
