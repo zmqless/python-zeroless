@@ -34,30 +34,6 @@ def _connect_zmq_sock(sock, ip, port):
     log.info('Connecting to {0} on port {1}'.format(ip, port))
     sock.connect('tcp://' + ip + ':' + str(port))
 
-def _send(sock):
-    while True:
-        data = (yield)
-        log.debug('Sending: {0}'.format(data))
-
-        try:
-            sock.send_multipart(data)
-        except TypeError:
-            error = 'Data must be bytes, so create another socket and try again'
-            log.exception(error)
-            raise TypeError(error)
-
-def _send_with_prefix(sock, prefix_frames):
-    while True:
-        data = prefix_frames + (yield)
-        log.debug('Sending: {0}'.format(data))
-
-        try:
-            sock.send_multipart(data)
-        except TypeError:
-            error = 'Data must be bytes, so create another socket and try again'
-            log.exception(error)
-            raise TypeError(error)
-
 def _recv(sock):
     while True:
         frames = sock.recv_multipart()
@@ -77,14 +53,23 @@ class Sock:
         return sock
 
     def __send_function(self, sock, topic=None):
-        if topic:
-            gen = _send_with_prefix(sock, topic)
-        else:
-            gen = _send(sock)
+        def _send(*data):
+            log.debug('Sending: {0}'.format(data))
 
-        gen.send(None)
-        func = lambda sender, *data: sender(data)
-        return partial(func, gen.send)
+            try:
+                sock.send_multipart(data)
+            except TypeError:
+                error = 'Data must be bytes, so try again'
+                log.exception(error)
+                raise TypeError(error)
+
+        if sock.socket_type == zmq.PUB:
+            if topic:
+                return partial(_send, topic)
+            else:
+                return partial(_send, b'')
+
+        return _send
 
     def __recv_generator(self, sock):
         return _recv(sock)
@@ -107,7 +92,7 @@ class Sock:
             raise TypeError(error)
 
         sock = self.__sock(zmq.PUB)
-        return self.__send_function(sock, (topic,))
+        return self.__send_function(sock, topic)
 
     def sub(self, topics=(b'',)):
         """
