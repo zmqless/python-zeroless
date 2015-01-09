@@ -34,6 +34,16 @@ def _connect_zmq_sock(sock, ip, port):
     log.info('Connecting to {0} on port {1}'.format(ip, port))
     sock.connect('tcp://' + ip + ':' + str(port))
 
+def _disconnect_zmq_sock(sock, ip, port):
+    log.info('Disconnecting to {0} on port {1}'.format(ip, port))
+
+    try:
+        sock.disconnect('tcp://' + ip + ':' + str(port))
+    except zmq.ZMQError:
+        error = 'There was no connection to {0} on port {1}'.format(ip, port)
+        log.exception(error)
+        raise ValueError(error)
+
 def _bind_zmq_sock(sock, port):
     log.info('Binding on port {0}'.format(port))
 
@@ -249,6 +259,27 @@ class Client(Sock):
         """
         self.connect('127.0.0.1', port)
 
+    def disconnect(self, ip, port):
+        _check_valid_port_range(port)
+
+        try:
+            address = (ip, port)
+            self._addresses.remove(address)
+        except ValueError:
+            error = 'There was no connection to {0} on port {1}'.format(ip, port)
+            log.exception(error)
+            raise ValueError(error)
+
+        if self._is_ready:
+            _disconnect_zmq_sock(self._sock, ip, port)
+
+    def disconnect_local(self, port):
+        self.disconnect('127.0.0.1', port)
+
+    def disconnect_all(self):
+        for ip, port in self._addresses:
+            self.disconnect(ip, port)
+
 class Server(Sock):
     """
     A server that clients can connect to.
@@ -274,5 +305,3 @@ class Server(Sock):
             warn(warning)
 
         _bind_zmq_sock(sock, self._port)
-
-
