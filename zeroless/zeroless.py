@@ -275,9 +275,9 @@ class Client(Sock):
         :type port: int
         """
         _check_valid_port_range(port)
+        address = (ip, port)
 
         try:
-            address = (ip, port)
             self._addresses.remove(address)
         except ValueError:
             error = 'There was no connection to {0} on port {1}'.format(ip, port)
@@ -300,7 +300,9 @@ class Client(Sock):
         """
         Disconnects from all connected servers.
         """
-        for ip, port in self._addresses:
+        addresses = self._addresses.copy()
+
+        for ip, port in addresses:
             self.disconnect(ip, port)
 
 class Server(Sock):
