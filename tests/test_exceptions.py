@@ -36,7 +36,7 @@ class TestExceptions:
 
     def test_connection_after_pattern_was_established(self):
         client = Client()
-        listen_for_pull = client.pull()
+        listen_for_push = client.pull()
 
         client.connect_local(port=1024)
 

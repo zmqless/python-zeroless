@@ -11,6 +11,7 @@ import zmq
 import logging
 
 from time import sleep
+from copy import deepcopy
 from warnings import warn
 from functools import partial
 
@@ -35,7 +36,7 @@ def _connect_zmq_sock(sock, ip, port):
     sock.connect('tcp://' + ip + ':' + str(port))
 
 def _disconnect_zmq_sock(sock, ip, port):
-    log.info('Disconnecting to {0} on port {1}'.format(ip, port))
+    log.info('Disconnecting from {0} on port {1}'.format(ip, port))
 
     try:
         sock.disconnect('tcp://' + ip + ':' + str(port))
@@ -300,7 +301,7 @@ class Client(Sock):
         """
         Disconnects from all connected servers.
         """
-        addresses = self._addresses.copy()
+        addresses = deepcopy(self._addresses)
 
         for ip, port in addresses:
             self.disconnect(ip, port)
