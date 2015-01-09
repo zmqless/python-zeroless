@@ -37,7 +37,6 @@ class TestExceptions:
     def test_there_was_no_connection_to_disconnect(self):
         client = Client()
         client.connect_local(port=1024)
-        push = client.push()
 
         with pytest.raises(ValueError):
             client.disconnect_local(port=1025)
@@ -52,12 +51,10 @@ class TestExceptions:
         client.connect_local(port=1024)
 
         with pytest.raises(ValueError):
-            client.disconnect_local(port=1025)
+            client.connect_local(port=1024)
 
         client.disconnect_local(port=1024)
-
-        with pytest.raises(ValueError):
-            client.disconnect_local(port=1024)
+        client.connect_local(port=1024)
 
     def test_port_already_used(self):
         listen_for_push = Server(port=65000).pull()
