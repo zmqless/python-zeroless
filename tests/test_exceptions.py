@@ -34,6 +34,20 @@ class TestExceptions:
         with pytest.raises(ValueError):
             Server(port=65536)
 
+    def test_connection_after_pattern_was_established(self):
+        client = Client()
+        listen_for_pull = client.pull()
+
+        client.connect_local(port=1024)
+
+        with pytest.raises(ValueError):
+            client.connect_local(port=1024)
+
+        client.disconnect_local(port=1024)
+
+        with pytest.raises(ValueError):
+            client.disconnect_local(port=1024)
+
     def test_there_was_no_connection_to_disconnect(self):
         client = Client()
         client.connect_local(port=1024)
@@ -55,6 +69,20 @@ class TestExceptions:
 
         client.disconnect_local(port=1024)
         client.connect_local(port=1024)
+
+    def test_disconnect_all(self):
+        client = Client()
+        client.connect_local(port=1024)
+        client.connect_local(port=1025)
+        client.connect_local(port=1026)
+        client.connect_local(port=1027)
+
+        client.disconnect_all()
+
+        client.connect_local(port=1024)
+        client.connect_local(port=1025)
+        client.connect_local(port=1026)
+        client.connect_local(port=1027)
 
     def test_port_already_used(self):
         listen_for_push = Server(port=65000).pull()
