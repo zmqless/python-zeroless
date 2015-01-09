@@ -9,13 +9,19 @@ class TestExceptions:
            client.connect_local(port=1023)
 
         with pytest.raises(ValueError):
+           client.disconnect_local(port=1023)
+
+        with pytest.raises(ValueError):
             Server(port=1023)
 
     def test_port_on_range(self):
         client = Client()
         client.connect_local(port=1024)
+        client.disconnect_local(port=1024)
         client.connect_local(port=7000)
+        client.disconnect_local(port=7000)
         client.connect_local(port=65535)
+        client.disconnect_local(port=65535)
 
     def test_port_after_range(self):
         client = Client()
@@ -23,10 +29,63 @@ class TestExceptions:
             client.connect_local(port=65536)
 
         with pytest.raises(ValueError):
+            client.disconnect_local(port=65536)
+
+        with pytest.raises(ValueError):
             Server(port=65536)
 
+    def test_connection_after_pattern_was_established(self):
+        client = Client()
+        listen_for_push = client.pull()
+
+        client.connect_local(port=1024)
+
+        with pytest.raises(ValueError):
+            client.connect_local(port=1024)
+
+        client.disconnect_local(port=1024)
+
+        with pytest.raises(ValueError):
+            client.disconnect_local(port=1024)
+
+    def test_there_was_no_connection_to_disconnect(self):
+        client = Client()
+        client.connect_local(port=1024)
+
+        with pytest.raises(ValueError):
+            client.disconnect_local(port=1025)
+
+        client.disconnect_local(port=1024)
+
+        with pytest.raises(ValueError):
+            client.disconnect_local(port=1024)
+
+    def test_connection_already_exist(self):
+        client = Client()
+        client.connect_local(port=1024)
+
+        with pytest.raises(ValueError):
+            client.connect_local(port=1024)
+
+        client.disconnect_local(port=1024)
+        client.connect_local(port=1024)
+
+    def test_disconnect_all(self):
+        client = Client()
+        client.connect_local(port=1024)
+        client.connect_local(port=1025)
+        client.connect_local(port=1026)
+        client.connect_local(port=1027)
+
+        client.disconnect_all()
+
+        client.connect_local(port=1024)
+        client.connect_local(port=1025)
+        client.connect_local(port=1026)
+        client.connect_local(port=1027)
+
     def test_port_already_used(self):
-        server1 = Server(port=65000).pull()
+        listen_for_push = Server(port=65000).pull()
 
         with pytest.raises(ValueError):
             Server(port=65000).pull()

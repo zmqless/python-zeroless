@@ -11,6 +11,7 @@ import zmq
 import logging
 
 from time import sleep
+from copy import deepcopy
 from warnings import warn
 from functools import partial
 
@@ -33,6 +34,26 @@ def _check_valid_num_connections(socket_type, num_connections):
 def _connect_zmq_sock(sock, ip, port):
     log.info('Connecting to {0} on port {1}'.format(ip, port))
     sock.connect('tcp://' + ip + ':' + str(port))
+
+def _disconnect_zmq_sock(sock, ip, port):
+    log.info('Disconnecting from {0} on port {1}'.format(ip, port))
+
+    try:
+        sock.disconnect('tcp://' + ip + ':' + str(port))
+    except zmq.ZMQError:
+        error = 'There was no connection to {0} on port {1}'.format(ip, port)
+        log.exception(error)
+        raise ValueError(error)
+
+def _bind_zmq_sock(sock, port):
+    log.info('Binding on port {0}'.format(port))
+
+    try:
+        sock.bind('tcp://*:' + str(port))
+    except zmq.ZMQError:
+        error = 'Port {0} is already in use'.format(port)
+        log.exception(error)
+        raise ValueError(error)
 
 def _recv(sock):
     while True:
@@ -222,6 +243,12 @@ class Client(Sock):
         _check_valid_port_range(port)
 
         address = (ip, port)
+
+        if address in self._addresses:
+            error = 'Already connected to {0} on port {1}'.format(ip, port)
+            log.exception(error)
+            raise ValueError(error)
+
         self._addresses.append(address)
 
         if self._is_ready:
@@ -232,12 +259,52 @@ class Client(Sock):
 
     def connect_local(self, port):
         """
-        Connects to a server from localhost at the specified port.
+        Connects to a server in localhost at the specified port.
 
         :param port: port number from 1024 up to 65535
         :type port: int
         """
         self.connect('127.0.0.1', port)
+
+    def disconnect(self, ip, port):
+        """
+        Disconnects from a server at the specified ip and port.
+
+        :param ip: an IP address
+        :type ip: str or unicode
+        :param port: port number from 1024 up to 65535
+        :type port: int
+        """
+        _check_valid_port_range(port)
+        address = (ip, port)
+
+        try:
+            self._addresses.remove(address)
+        except ValueError:
+            error = 'There was no connection to {0} on port {1}'.format(ip, port)
+            log.exception(error)
+            raise ValueError(error)
+
+        if self._is_ready:
+            _disconnect_zmq_sock(self._sock, ip, port)
+
+    def disconnect_local(self, port):
+        """
+        Disconnects from a server in localhost at the specified port.
+
+        :param port: port number from 1024 up to 65535
+        :type port: int
+        """
+        self.disconnect('127.0.0.1', port)
+
+    def disconnect_all(self):
+        """
+        Disconnects from all connected servers.
+        """
+        addresses = deepcopy(self._addresses)
+
+        for ip, port in addresses:
+            self.disconnect(ip, port)
 
 class Server(Sock):
     """
@@ -263,11 +330,4 @@ class Server(Sock):
             warning += 'is not an option'
             warn(warning)
 
-        log.info('Binding on port {0}'.format(self._port))
-
-        try:
-            sock.bind('tcp://*:' + str(self._port))
-        except zmq.ZMQError:
-            error = 'Port {0} is already in use'.format(self._port)
-            log.exception(error)
-            raise ValueError(error)
+        _bind_zmq_sock(sock, self._port)
