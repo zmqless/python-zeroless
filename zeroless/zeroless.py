@@ -258,7 +258,7 @@ class Client(Sock):
 
     def connect_local(self, port):
         """
-        Connects to a server from localhost at the specified port.
+        Connects to a server in localhost at the specified port.
 
         :param port: port number from 1024 up to 65535
         :type port: int
@@ -266,6 +266,14 @@ class Client(Sock):
         self.connect('127.0.0.1', port)
 
     def disconnect(self, ip, port):
+        """
+        Disconnects from a server at the specified ip and port.
+
+        :param ip: an IP address
+        :type ip: str or unicode
+        :param port: port number from 1024 up to 65535
+        :type port: int
+        """
         _check_valid_port_range(port)
 
         try:
@@ -280,9 +288,18 @@ class Client(Sock):
             _disconnect_zmq_sock(self._sock, ip, port)
 
     def disconnect_local(self, port):
+        """
+        Disconnects from a server in localhost at the specified port.
+
+        :param port: port number from 1024 up to 65535
+        :type port: int
+        """
         self.disconnect('127.0.0.1', port)
 
     def disconnect_all(self):
+        """
+        Disconnects from all connected servers.
+        """
         for ip, port in self._addresses:
             self.disconnect(ip, port)
 
