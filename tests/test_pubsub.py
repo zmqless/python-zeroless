@@ -22,7 +22,7 @@ def listen_for_pub_with_topic():
 
 @pytest.fixture(scope="module")
 def pub_with_topic():
-    return Server(port=7894).pub(topic=b'sh')
+    return Server(port=7894).pub(topic=b'sh', embed_topic=True)
 
 class TestPubSub:
     def test_publish(self, pub, listen_for_pub):
@@ -31,7 +31,7 @@ class TestPubSub:
         sleep(0.1)
         pub(msg)
         result = next(listen_for_pub)
-        assert result == [b'', msg]
+        assert result == msg
 
     def test_publish_with_topic(self, pub_with_topic, listen_for_pub_with_topic):
         msg = b'msg'
@@ -49,7 +49,7 @@ class TestPubSub:
         sleep(0.1)
         pub(msg1, msg2)
         result = next(listen_for_pub)
-        assert result == [b'', msg1, msg2]
+        assert result == [msg1, msg2]
 
     def test_multiple_publish(self, pub, listen_for_pub):
         msgs = [b'msg' + bytes(i) for i in range(10)]
@@ -58,7 +58,7 @@ class TestPubSub:
         for msg in msgs:
             pub(msg)
             result = next(listen_for_pub)
-            assert result == [b'', msg]
+            assert result == msg
 
     def test_multiple_publish_multipart(self, pub, listen_for_pub):
         msgs1 = [b'msg1' + bytes(i) for i in range(10)]
@@ -68,4 +68,4 @@ class TestPubSub:
         for msg1, msg2 in zip(msgs1, msgs2):
             pub(msg1, msg2)
             result = next(listen_for_pub)
-            assert result == [b'', msg1, msg2]
+            assert result == [msg1, msg2]
