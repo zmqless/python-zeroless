@@ -73,7 +73,7 @@ class Sock:
 
         return sock
 
-    def __send_function(self, sock, topic=None):
+    def __send_function(self, sock, topic=None, embed_topic=False):
         def _send(*data):
             log.debug('Sending: {0}'.format(data))
 
@@ -84,7 +84,7 @@ class Sock:
                 log.exception(error)
                 raise TypeError(error)
 
-        if sock.socket_type == zmq.PUB:
+        if sock.socket_type == zmq.PUB and embed_topic:
             if topic:
                 return partial(_send, topic)
             else:
@@ -96,7 +96,7 @@ class Sock:
         return _recv(sock)
 
     # PubSub pattern
-    def pub(self, topic=b''):
+    def pub(self, topic=b'', embed_topic=False):
         """
         Returns a callable that can be used to transmit a message, with a given
         ``topic``, in a publisher-subscriber fashion. Note that the sender
@@ -105,6 +105,9 @@ class Sock:
 
         :param topic: the topic that will be published to (default=b'')
         :type topic: bytes
+        :param embed_topic: set to embed the topic into published messages
+                            (default=False)
+        :type embed_topic bool
         :rtype: function
         """
         if not isinstance(topic, bytes):
@@ -113,7 +116,7 @@ class Sock:
             raise TypeError(error)
 
         sock = self.__sock(zmq.PUB)
-        return self.__send_function(sock, topic)
+        return self.__send_function(sock, topic, embed_topic)
 
     def sub(self, topics=(b'',)):
         """
