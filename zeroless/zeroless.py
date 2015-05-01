@@ -334,3 +334,7 @@ class Server(Sock):
             warn(warning)
 
         _bind_zmq_sock(sock, self._port)
+
+    @property
+    def port(self):
+        return self._port
