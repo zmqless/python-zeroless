@@ -234,6 +234,10 @@ class Client(Sock):
         for ip, port in self._addresses:
             _connect_zmq_sock(self._sock, ip, port)
 
+    @property
+    def addresses(self):
+        return tuple(self._addresses)
+
     def connect(self, ip, port):
         """
         Connects to a server at the specified ip and port.
