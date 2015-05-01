@@ -236,6 +236,12 @@ class Client(Sock):
 
     @property
     def addresses(self):
+        """
+        Returns a tuple containing all the connected addresses. Each address
+        is a tuple with an ip address and a port.
+
+        :rtype: (addresses)
+        """
         return tuple(self._addresses)
 
     def connect(self, ip, port):
@@ -341,4 +347,9 @@ class Server(Sock):
 
     @property
     def port(self):
+        """
+        Returns the port.
+
+        :rtype: int
+        """
         return self._port
