@@ -234,6 +234,16 @@ class Client(Sock):
         for ip, port in self._addresses:
             _connect_zmq_sock(self._sock, ip, port)
 
+    @property
+    def addresses(self):
+        """
+        Returns a tuple containing all the connected addresses. Each address
+        is a tuple with an ip address and a port.
+
+        :rtype: (addresses)
+        """
+        return tuple(self._addresses)
+
     def connect(self, ip, port):
         """
         Connects to a server at the specified ip and port.
@@ -334,3 +344,12 @@ class Server(Sock):
             warn(warning)
 
         _bind_zmq_sock(sock, self._port)
+
+    @property
+    def port(self):
+        """
+        Returns the port.
+
+        :rtype: int
+        """
+        return self._port
