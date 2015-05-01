@@ -1,6 +1,6 @@
 import pytest
 
-from zeroless import(Server, Client)
+from zeroless import (Server, Client)
 
 class TestExceptions:
     def test_port_under_range(self):
