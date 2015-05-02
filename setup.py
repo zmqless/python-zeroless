@@ -36,9 +36,12 @@ setup(name='zeroless',
           'Operating System :: MacOS :: MacOS X',
           'Operating System :: Microsoft :: Windows',
           'Operating System :: POSIX',
-          'License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)'
+          'License :: OSI Approved :: GNU Lesser General Public License v2\
+          or later (LGPLv2+)'
       ],
-      keywords='pyzmq zeromq zmq ØMQ networking distributed socket',
+      keywords='pyzmq zeromq zmq ØMQ networking distributed socket client\
+               server p2p publish subscribe request reply push pull\
+               communication internet backend microservices',
       url='https://github.com/zmqless/zeroless',
       author='Lucas Lira Gomes',
       author_email='x8lucas8x@gmail.com',
