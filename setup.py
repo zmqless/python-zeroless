@@ -20,8 +20,12 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+def version():
+    with open('VERSION') as f:
+        return f.read().strip()
+
 setup(name='zeroless',
-      version='0.5.0',
+      version=version(),
       description='ZeroMQ for Pythonistas™',
       long_description=readme(),
       classifiers=[
