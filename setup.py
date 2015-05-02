@@ -4,6 +4,7 @@ import sys
 
 from setuptools import setup
 
+from zeroless_helpers import version
 from setuptools.command.test import test as TestCommand
 
 class Pytest(TestCommand):
@@ -19,10 +20,6 @@ class Pytest(TestCommand):
 def readme():
     with open('README.rst') as f:
         return f.read()
-
-def version():
-    with open('VERSION') as f:
-        return f.read().strip()
 
 setup(name='zeroless',
       version=version(),
@@ -41,12 +38,12 @@ setup(name='zeroless',
           'Operating System :: POSIX',
           'License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)'
       ],
-      keywords='pyzmq zeromq zmq networking distributed socket',
+      keywords='pyzmq zeromq zmq ØMQ networking distributed socket',
       url='https://github.com/zmqless/zeroless',
       author='Lucas Lira Gomes',
       author_email='x8lucas8x@gmail.com',
       license='LGPLv2+',
-      packages=['zeroless'],
+      packages=['zeroless', 'zeroless_helpers'],
       install_requires=[
           'pyzmq',
       ],

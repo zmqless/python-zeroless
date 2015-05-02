@@ -1,12 +1,4 @@
 from .zeroless import *
-
-def version():
-    """
-    Returns the version of the zeroless module.
-
-    :rtype: string
-    """
-    with open('VERSION') as f:
-        return f.read().strip()
+from zeroless_helpers import version
 
 __version__ = version()
