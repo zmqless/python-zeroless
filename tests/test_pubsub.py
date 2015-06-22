@@ -15,9 +15,19 @@ def pub():
     return Server(port=7893).pub()
 
 @pytest.fixture(scope="module")
+def listen_for_pub_with_topic():
+    client = Client()
+    client.connect_local(port=7895)
+    return client.sub(topics=[b'sh'])
+
+@pytest.fixture(scope="module")
+def pub_with_topic():
+    return Server(port=7895).pub(topic=b'sh')
+
+@pytest.fixture(scope="module")
 def listen_for_pub_with_embedded_topic():
     client = Client()
-    client.connect(ip='127.0.0.1', port=7894)
+    client.connect_local(port=7894)
     return client.sub(topics=[b'sh'])
 
 @pytest.fixture(scope="module")
@@ -27,12 +37,12 @@ def pub_with_embedded_topic():
 @pytest.fixture(scope="module")
 def listen_for_pub_with_empty_topic():
     client = Client()
-    client.connect(ip='127.0.0.1', port=7895)
+    client.connect_local(port=7896)
     return client.sub()
 
 @pytest.fixture(scope="module")
 def pub_with_empty_topic():
-    return Server(port=7895).pub(embed_topic=True)
+    return Server(port=7896).pub(embed_topic=True)
 
 class TestPubSub:
     def test_publish(self, pub, listen_for_pub):
@@ -41,6 +51,16 @@ class TestPubSub:
         sleep(0.1)
         pub(msg)
         result = next(listen_for_pub)
+        assert result == msg
+
+    def test_publish_with_topic(self,
+                                pub_with_topic,
+                                listen_for_pub_with_topic):
+        msg = b'sh msg'
+
+        sleep(0.1)
+        pub_with_topic(msg)
+        result = next(listen_for_pub_with_topic)
         assert result == msg
 
     def test_publish_with_embedded_topic(self,
