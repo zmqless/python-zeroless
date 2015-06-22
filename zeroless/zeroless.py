@@ -84,11 +84,22 @@ class Sock:
                 log.exception(error)
                 raise TypeError(error)
 
-        if sock.socket_type == zmq.PUB and embed_topic:
-            if topic:
+        if sock.socket_type == zmq.PUB:
+            if embed_topic:
                 return partial(_send, topic)
-            else:
-                return partial(_send, b'')
+
+            def _send_and_enforce_topic(*data):
+                if not data[0].startswith(topic):
+                    error = 'If embed_topic argument is not set, then the '
+                    error += 'topic must be at the beginning of the first '
+                    error += 'part (i.e. frame) of every published message'
+                    log.exception(error)
+                    raise ValueError(error)
+
+                return _send(*data)
+
+            if not topic == b'':
+                return _send_and_enforce_topic
 
         return _send
 
@@ -103,9 +114,16 @@ class Sock:
         function has a ``print`` like signature, with an infinite number of
         arguments. Each one being a part of the complete message.
 
+        By default, no topic will be included into published messages. Being up
+        to developers to include the topic, at the beginning of the first part
+        (i.e. frame) of every published message, so that subscribers are able
+        to receive them. For a different behaviour, check the embed_topic
+        argument.
+
         :param topic: the topic that will be published to (default=b'')
         :type topic: bytes
-        :param embed_topic: set to embed the topic into published messages
+        :param embed_topic: set for the topic to be automatically sent as the
+                            first part (i.e. frame) of every published message
                             (default=False)
         :type embed_topic bool
         :rtype: function
