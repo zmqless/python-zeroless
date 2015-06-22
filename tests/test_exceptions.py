@@ -116,6 +116,14 @@ class TestExceptions:
         with pytest.raises(TypeError):
             client.sub(topics=[b'topic1', u'topic2'])
 
+    def test_published_topic_is_not_included_into_message(self):
+        pub = Server(port=7150).pub(topic=b'topic1')
+
+        pub(b'topic1 msg')
+
+        with pytest.raises(ValueError):
+            pub(b'msg')
+
     def test_pair_client_cannot_connect_more_than_once(self):
         client = Client()
         client.connect_local(port=7200)
