@@ -286,8 +286,8 @@ along with this library. If not, see http://www.gnu.org/licenses/.
    :target: https://readthedocs.org/projects/zeroless/?badge=latest
 .. |License| image:: https://img.shields.io/pypi/l/zeroless.svg?style=flat
    :target: https://www.gnu.org/licenses/lgpl-2.1.html
-.. |Codacy| image:: https://img.shields.io/codacy/116ada408f3c45709197e0e5d2fe46ba.svg?style=flat
-   :target: https://www.codacy.com/p/4364
+.. |Codacy| image:: https://www.codacy.com/project/badge/8499be83359e4eccaa363b14cda4cbe0
+   :target: https://www.codacy.com/app/x8lucas8x/Zeroless
 .. |PyPi| image:: https://img.shields.io/pypi/v/zeroless.svg?style=flat
    :target: https://pypi.python.org/pypi/zeroless
 
