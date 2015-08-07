@@ -25,7 +25,7 @@ The canonical repository for Zeroless is on GitHub_.
 
 .. code-block:: bash
 
-    $ git clone git@github.com:zmqless/zeroless.git
+    $ git clone git@github.com:zmqless/python-zeroless.git
     $ cd zeroless
     $ python setup.py develop
 
@@ -33,4 +33,4 @@ The best reason to install from source is to help us develop Zeroless. See the
 :doc:`development` section for more on that.
 
 .. _PyZMQ: https://www.github.com/zeromq/pyzmq
-.. _GitHub: https://github.com/zmqless/zeroless 
+.. _GitHub: https://github.com/zmqless/python-zeroless

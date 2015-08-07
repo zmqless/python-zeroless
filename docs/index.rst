@@ -93,24 +93,13 @@ License
    :start-after: _license_content_start:
    :end-before:  _license_content_end:
 
-.. |Build Status| image:: https://img.shields.io/travis/zmqless/zeroless.svg?style=flat
-   :target: https://travis-ci.org/zmqless/zeroless
-.. |Coverage Status| image:: https://img.shields.io/coveralls/zmqless/zeroless.svg?style=flat
-   :target: https://coveralls.io/r/zmqless/zeroless?branch=master
-.. |Docs| image:: https://readthedocs.org/projects/zeroless/badge/?version=latest
-   :target: https://readthedocs.org/projects/zeroless/?badge=latest
-.. |License| image:: https://img.shields.io/pypi/l/zeroless.svg?style=flat
-   :target: https://www.gnu.org/licenses/lgpl-2.1.html
-.. |Codacy| image:: https://img.shields.io/codacy/116ada408f3c45709197e0e5d2fe46ba.svg?style=flat
-   :target: https://www.codacy.com/p/4364
-.. |PyPi| image:: https://img.shields.io/pypi/v/zeroless.svg?style=flat
-   :target: https://pypi.python.org/pypi/zeroless
+.. include:: ../README.rst
+   :start-after: _available_badges_start:
+   :end-before:  _available_badges_end:
 
 .. _ØMQ: http://www.zeromq.org
 .. _ØMQGuide: http://zguide.zeromq.org
 .. _PyZMQ: https://www.github.com/zeromq/pyzmq
-.. _GitHub: https://github.com/zmqless/zeroless 
-.. _Tracker: https://github.com/zmqless/zeroless/issues
+.. _GitHub: https://github.com/zmqless/python-zeroless
+.. _Tracker: https://github.com/zmqless/python-zeroless/issues
 .. _PyPy: https://pypi.python.org/pypi/zeroless
-
-

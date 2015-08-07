@@ -41,7 +41,7 @@ setup(name='zeroless',
       keywords='pyzmq zeromq zmq ØMQ networking distributed socket client\
                server p2p publish subscribe request reply push pull\
                communication internet backend microservices',
-      url='https://github.com/zmqless/zeroless',
+      url='https://github.com/zmqless/python-zeroless',
       author='Lucas Lira Gomes',
       author_email='x8lucas8x@gmail.com',
       license='LGPLv2+',

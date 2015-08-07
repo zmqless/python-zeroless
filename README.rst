@@ -278,19 +278,23 @@ along with this library. If not, see http://www.gnu.org/licenses/.
 
 .. _license_content_end:
 
-.. |Build Status| image:: https://img.shields.io/travis/zmqless/zeroless.svg?style=flat
-   :target: https://travis-ci.org/zmqless/zeroless
-.. |Coverage Status| image:: https://img.shields.io/coveralls/zmqless/zeroless.svg?style=flat
-   :target: https://coveralls.io/r/zmqless/zeroless?branch=master
-.. |Docs| image:: https://readthedocs.org/projects/zeroless/badge/?version=latest
-   :target: https://readthedocs.org/projects/zeroless/?badge=latest
+.. _available_badges_start:
+
+.. |Build Status| image:: https://img.shields.io/travis/zmqless/python-zeroless.svg?style=flat
+   :target: https://travis-ci.org/zmqless/python-zeroless
+.. |Coverage Status| image:: https://coveralls.io/repos/zmqless/python-zeroless/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/zmqless/python-zeroless?branch=master
+.. |Docs| image:: https://readthedocs.org/projects/python-zeroless/badge/?version=latest
+   :target: https://readthedocs.org/projects/python-zeroless/?badge=latest
 .. |License| image:: https://img.shields.io/pypi/l/zeroless.svg?style=flat
    :target: https://www.gnu.org/licenses/lgpl-2.1.html
 .. |Codacy| image:: https://www.codacy.com/project/badge/8499be83359e4eccaa363b14cda4cbe0
-   :target: https://www.codacy.com/app/x8lucas8x/Zeroless
+   :target: https://www.codacy.com/app/x8lucas8x/python-zeroless
 .. |PyPi| image:: https://img.shields.io/pypi/v/zeroless.svg?style=flat
    :target: https://pypi.python.org/pypi/zeroless
 
+.. _available_badges_end:
+
 .. _ØMQ: http://www.zeromq.org
 .. _PyZMQ: https://www.github.com/zeromq/pyzmq
-.. _documentation: http://zeroless.readthedocs.org/en/latest/
+.. _documentation: http://python-zeroless.readthedocs.org/en/latest/
