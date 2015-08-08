@@ -1,5 +1,5 @@
-__major_version__ = 0
-__minor_version__ = 6
+__major_version__ = 1
+__minor_version__ = 0
 __patch_version__ = 0
 
 def version():
