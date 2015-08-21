@@ -14,7 +14,7 @@ make distributed systems employing ØMQ_ as pythonic as possible.
 Being simpler to use, Zeroless doesn't supports all of the fine aspects
 and features of ØMQ_. However, you can expect to find all the message
 passing patterns you were accustomed to (i.e. pair, request/reply,
-publisher/subscriber, push/pull). Depite that, the only transport
+publisher/subscriber, push/pull). Despite that, the only transport
 available is TCP, as threads are not as efficient in Python due to the
 GIL and IPC is unix-only.
 
