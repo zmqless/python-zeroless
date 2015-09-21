@@ -270,6 +270,7 @@ class Client(Sock):
         :type ip: str or unicode
         :param port: port number from 1024 up to 65535
         :type port: int
+        :rtype: self
         """
         _check_valid_port_range(port)
 
@@ -288,14 +289,17 @@ class Client(Sock):
 
             _connect_zmq_sock(self._sock, ip, port)
 
+        return self
+
     def connect_local(self, port):
         """
         Connects to a server in localhost at the specified port.
 
         :param port: port number from 1024 up to 65535
         :type port: int
+        :rtype: self
         """
-        self.connect('127.0.0.1', port)
+        return self.connect('127.0.0.1', port)
 
     def disconnect(self, ip, port):
         """
@@ -305,6 +309,7 @@ class Client(Sock):
         :type ip: str or unicode
         :param port: port number from 1024 up to 65535
         :type port: int
+        :rtype: self
         """
         _check_valid_port_range(port)
         address = (ip, port)
@@ -319,23 +324,29 @@ class Client(Sock):
         if self._is_ready:
             _disconnect_zmq_sock(self._sock, ip, port)
 
+        return self
+
     def disconnect_local(self, port):
         """
         Disconnects from a server in localhost at the specified port.
 
         :param port: port number from 1024 up to 65535
         :type port: int
+        :rtype: self
         """
-        self.disconnect('127.0.0.1', port)
+        return self.disconnect('127.0.0.1', port)
 
     def disconnect_all(self):
         """
         Disconnects from all connected servers.
+        :rtype: self
         """
         addresses = deepcopy(self._addresses)
 
         for ip, port in addresses:
             self.disconnect(ip, port)
+
+        return self
 
 class Server(Sock):
     """
