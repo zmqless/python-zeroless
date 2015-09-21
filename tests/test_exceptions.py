@@ -23,6 +23,15 @@ class TestExceptions:
         client.connect_local(port=65535)
         client.disconnect_local(port=65535)
 
+    def test_port_on_range_cascaded(self):
+        Client()\
+        .connect_local(port=1024)\
+        .disconnect_local(port=1024)\
+        .connect_local(port=7000)\
+        .disconnect_local(port=7000)\
+        .connect_local(port=65535)\
+        .disconnect_local(port=65535)
+
     def test_port_after_range(self):
         client = Client()
         with pytest.raises(ValueError):
@@ -83,6 +92,18 @@ class TestExceptions:
         client.connect_local(port=1025)
         client.connect_local(port=1026)
         client.connect_local(port=1027)
+
+    def test_disconnect_all_cascaded(self):
+        Client()\
+        .connect_local(port=1024)\
+        .connect_local(port=1025)\
+        .connect_local(port=1026)\
+        .connect_local(port=1027)\
+        .disconnect_all()\
+        .connect_local(port=1024)\
+        .connect_local(port=1025)\
+        .connect_local(port=1026)\
+        .connect_local(port=1027)
 
     def test_port_already_used(self):
         listen_for_push = Server(port=65000).pull()
