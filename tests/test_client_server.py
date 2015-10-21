@@ -17,3 +17,12 @@ class TestClientServer:
             client.connect(ip, port)
 
         assert client.addresses == addresses
+
+    def test_server_can_bind_on_random_port(self):
+        server = Server(port=None)
+
+        assert server.port == None
+
+        listener = server.pull()
+
+        assert isinstance(server.port, int)
