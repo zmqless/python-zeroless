@@ -49,7 +49,11 @@ def _bind_zmq_sock(sock, port):
     log.info('Binding on port {0}'.format(port))
 
     try:
-        sock.bind('tcp://*:' + str(port))
+        if port:
+            sock.bind('tcp://*:' + str(port))
+            return port
+        else:
+            return sock.bind_to_random_port('tcp://*')
     except zmq.ZMQError:
         error = 'Port {0} is already in use'.format(port)
         log.exception(error)
@@ -356,10 +360,13 @@ class Server(Sock):
         """
         Constructor of the Server.
 
-        :param port: port number from 1024 up to 65535
+        :param port: either a port number from 1024 up to 65535 or None.
+        In the latter case the server will be bound on a random port and the
+        actual value for the port will be available only after the binding
         :type port: int
         """
-        _check_valid_port_range(port)
+        if port:
+            _check_valid_port_range(port)
         self._port = port
 
         Sock.__init__(self)
@@ -372,7 +379,7 @@ class Server(Sock):
             warning += 'is not an option'
             warn(warning)
 
-        _bind_zmq_sock(sock, self._port)
+        self._port = _bind_zmq_sock(sock, self._port)
 
     @property
     def port(self):
